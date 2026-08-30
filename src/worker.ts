@@ -55,7 +55,10 @@ export const ENTRY_POINTS: [string, string][] = [
   ["/docs/reference-components", "every component, with its props"],
   ["/docs/explanation", "why the define and build phases are separate"],
   ["/llms.txt", "the site index, written for agents"],
+  ["/openapi.json", "this site's machine surface, described in OpenAPI 3.1"],
   ["/versions.json", "what this site runs and what it documents"],
+  ["/about", "what Jostraca is and who maintains it"],
+  ["/contact", "how to report a bug or reach the maintainer"],
 ];
 
 /**

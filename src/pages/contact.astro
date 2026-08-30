@@ -1,0 +1,78 @@
+---
+import Prose from "../layouts/Prose.astro";
+import { GITHUB_REPO, SITE_REPO, AUTHOR } from "../consts";
+
+const title = "Contact";
+const description =
+  "How to report a bug, ask a question, raise a security issue, or correct " +
+  "the documentation for Jostraca.";
+---
+
+<Prose
+  title={title}
+  description={description}
+  lede="Jostraca is maintained in the open. Every route below is public, and the issue tracker is the one to reach for first."
+>
+  <h2 id="bugs">Bugs and questions</h2>
+
+  <p>
+    Open an issue on
+    <a href={`${GITHUB_REPO}/issues`} rel="noopener">the generator's issue tracker</a>.
+    That is the primary support channel and the fastest way to get an answer,
+    because the answer stays where the next person will find it.
+  </p>
+
+  <p>
+    A good report names the version you are on, whether you are using the
+    TypeScript package or the Go module, and the smallest generator that shows
+    the problem. Both implementations are held to a shared test corpus, so if
+    something differs between them, that is worth reporting on its own — a
+    divergence is a bug even when neither side is obviously wrong.
+  </p>
+
+  <h2 id="docs">Corrections to this documentation</h2>
+
+  <p>
+    The pages on this site are generated from the generator repository, not
+    written here, so a correction belongs upstream where the examples are
+    executed against the code. Open an issue or a pull request on
+    <a href={GITHUB_REPO} rel="noopener">the generator</a> and the fix reaches
+    this site on the next sync.
+  </p>
+
+  <p>
+    Something wrong with the site itself — a broken link, a rendering problem,
+    an accessibility fault — belongs on
+    <a href={SITE_REPO} rel="noopener">the site repository</a> instead.
+  </p>
+
+  <h2 id="security">Security</h2>
+
+  <p>
+    Report a suspected vulnerability privately through
+    <a href={`${GITHUB_REPO}/security/advisories/new`} rel="noopener">GitHub's
+    private advisory form</a> rather than a public issue, so a fix can be
+    prepared before the details are public. Please include the version affected
+    and, where you can, a minimal reproduction. You will get an
+    acknowledgement; this is a small open source project rather than a company
+    with a staffed security desk, so please size your expectations accordingly.
+  </p>
+
+  <h2 id="maintainer">The maintainer</h2>
+
+  <p>
+    Jostraca is written and maintained by
+    <a href={AUTHOR.url} rel="noopener">{AUTHOR.name}</a>. For anything that
+    genuinely does not fit a public issue — a commercial question, a
+    conversation you cannot have in the open — the contact routes on
+    <a href={AUTHOR.url} rel="noopener">his site</a> are the way through.
+  </p>
+
+  <p class="footnote">
+    There is no phone line and no postal desk: this is an open source project,
+    and the issue tracker is the honest answer to "how do I reach you". The
+    machine-readable version of this page is
+    <a href="/contact.md">/contact.md</a>, and the site's contact point is
+    published in the JSON-LD on the <a href="/">home page</a>.
+  </p>
+</Prose>

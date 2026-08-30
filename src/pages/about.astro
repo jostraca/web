@@ -1,0 +1,96 @@
+---
+import Prose from "../layouts/Prose.astro";
+import {
+  GITHUB_REPO,
+  SITE_REPO,
+  NPM_PACKAGE,
+  GO_PKG_DOC,
+  JOSTRACA_VERSION,
+  AUTHOR,
+} from "../consts";
+
+const title = "About";
+const description =
+  "What Jostraca is, who maintains it, how it is tested, and what the two " +
+  "implementations guarantee each other.";
+---
+
+<Prose
+  title={title}
+  description={description}
+  lede="Jostraca is an open source code and project generator. It is a library you import, not a service you call, and this site is its documentation."
+>
+  <h2 id="what">What it is</h2>
+
+  <p>
+    Jostraca builds file trees from components. You declare <code>Project</code>,
+    <code>Folder</code>, <code>File</code> and <code>Content</code> inside a callback;
+    that callback touches nothing on disk, it records an in-memory tree. A second
+    phase then walks the tree and writes it. Because the whole intended output is
+    known before the first byte is written, a second run over code somebody edited
+    by hand has choices — preserve it, present the new version beside it, write a
+    diff, or perform a three-way merge — instead of one destructive default.
+  </p>
+
+  <p>
+    That is the entire reason the project exists. Most generators are delightful
+    once and dangerous twice; the cost of making the second run safe is the
+    two-phase design, and the <a href="/docs/explanation">explanation</a> argues it
+    in full, including what it costs.
+  </p>
+
+  <h2 id="implementations">Two implementations, held together</h2>
+
+  <p>
+    Jostraca ships as a TypeScript package on
+    <a href={NPM_PACKAGE} rel="noopener">npm</a> and as a
+    <a href={GO_PKG_DOC} rel="noopener">Go module</a>. TypeScript is canonical: when
+    the two disagree, Go is the one that changes, even on the occasions when the Go
+    code happens to be more correct. The two are held to the same behaviour by a
+    shared, language-neutral test corpus that both stacks assert against, so a
+    divergence fails a test rather than surprising somebody a release later.
+  </p>
+
+  <p>
+    Two versions matter here, and they are not always the same one. This site
+    runs its own authored examples against <code>{JOSTRACA_VERSION}</code>, the
+    package it pins. The documentation pages are synced from the generator's
+    repository, where each snippet is executed in a temporary directory by a
+    real process and compared against the file tree it wrote — against the code
+    at that commit, which can be ahead of the published package. So a synced
+    page cannot drift from the generator, but it can describe a release you have
+    not installed yet. <a href="/versions.json">/versions.json</a> reports the
+    pin, and each page links the file it came from.
+  </p>
+
+  <h2 id="who">Who maintains it</h2>
+
+  <p>
+    Jostraca is written and maintained by
+    <a href={AUTHOR.url} rel="noopener">{AUTHOR.name}</a>, who has been building
+    and writing about component-oriented systems in Node.js for a long time. The
+    project is MIT licensed. Contributions, bug reports and corrections are
+    welcome through the issue tracker; see <a href="/contact">contact</a>.
+  </p>
+
+  <h2 id="source">Where everything lives</h2>
+
+  <dl>
+    <dt><a href={GITHUB_REPO} rel="noopener">The generator</a></dt>
+    <dd>Both implementations, the shared corpus, and the documentation these pages are generated from.</dd>
+
+    <dt><a href={SITE_REPO} rel="noopener">This site</a></dt>
+    <dd>The Astro source for jostraca.org. Versioned and deployed separately from the generator.</dd>
+
+    <dt><a href="/llms.txt">/llms.txt</a> and <a href="/openapi.json">/openapi.json</a></dt>
+    <dd>
+      The machine-readable index and the description of this site's content API,
+      for agents and tooling. Every page here is also served as markdown.
+    </dd>
+  </dl>
+
+  <p class="footnote">
+    Next: the <a href="/docs/tutorial">tutorial</a> builds a generator from
+    nothing, and <a href="/why">why Jostraca</a> makes the case for the design.
+  </p>
+</Prose>

@@ -1,0 +1,115 @@
+---
+import {
+  SITE_TITLE,
+  SITE_TAGLINE,
+  SITE_DESCRIPTION,
+  SITE_URL,
+  GITHUB_REPO,
+  NPM_PACKAGE,
+  GO_PKG_DOC,
+  JOSTRACA_VERSION,
+  AUTHOR,
+} from "../consts";
+
+// JSON-LD identity for this site, as one @graph.
+//
+// Every claim here is checkable somewhere else on the site or in the package
+// registry, which is the only kind of claim worth publishing: an agent that
+// reads structured data is trusting it precisely because it cannot read the
+// page. Two fields a completeness checker will look for are deliberately
+// absent -- ContactPoint.telephone and PostalAddress -- because this is an
+// open source project with no switchboard and no office, and inventing either
+// would be the one thing worse than omitting them. The contact route that
+// does exist, the issue tracker, is named instead.
+
+interface Props {
+  /** The homepage carries the product node; inner pages carry identity only. */
+  home?: boolean;
+}
+const { home = false } = Astro.props;
+
+const ORG = `${SITE_URL}/#organization`;
+const SITE = `${SITE_URL}/#website`;
+const APP = `${SITE_URL}/#software`;
+
+const organization = {
+  "@type": "Organization",
+  "@id": ORG,
+  name: SITE_TITLE,
+  url: SITE_URL,
+  description: SITE_TAGLINE,
+  logo: {
+    "@type": "ImageObject",
+    url: `${SITE_URL}/favicon.svg`,
+    caption: `${SITE_TITLE} mark`,
+  },
+  sameAs: [GITHUB_REPO, NPM_PACKAGE, GO_PKG_DOC, AUTHOR.github],
+  contactPoint: [
+    {
+      "@type": "ContactPoint",
+      contactType: "technical support",
+      url: `${GITHUB_REPO}/issues`,
+      availableLanguage: ["en"],
+    },
+  ],
+};
+
+const website = {
+  "@type": "WebSite",
+  "@id": SITE,
+  url: SITE_URL,
+  name: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  inLanguage: "en",
+  publisher: { "@id": ORG },
+};
+
+const software = {
+  "@type": ["SoftwareApplication", "SoftwareSourceCode"],
+  "@id": APP,
+  name: SITE_TITLE,
+  alternateName: "jostraca",
+  description: SITE_DESCRIPTION,
+  url: SITE_URL,
+  applicationCategory: "DeveloperApplication",
+  // No `operatingSystem`. It means what it says -- Windows, macOS, Linux --
+  // and putting the language runtimes there made consumers report nonsense OS
+  // compatibility. The runtimes are `runtimePlatform`, below, where they mean
+  // something; a cross-platform library is better off saying nothing here.
+  softwareVersion: JOSTRACA_VERSION,
+  codeRepository: GITHUB_REPO,
+  downloadUrl: NPM_PACKAGE,
+  installUrl: NPM_PACKAGE,
+  programmingLanguage: ["TypeScript", "Go"],
+  runtimePlatform: ["Node.js", "Go"],
+  license: "https://opensource.org/licenses/MIT",
+  isAccessibleForFree: true,
+  offers: {
+    "@type": "Offer",
+    price: 0,
+    priceCurrency: "USD",
+    availability: "https://schema.org/InStock",
+  },
+  author: {
+    "@type": "Person",
+    name: AUTHOR.name,
+    url: AUTHOR.url,
+    sameAs: [AUTHOR.github],
+  },
+  maintainer: { "@id": ORG },
+  publisher: { "@id": ORG },
+  softwareHelp: { "@type": "CreativeWork", url: `${SITE_URL}/docs` },
+  discussionUrl: `${GITHUB_REPO}/issues`,
+  // No `sameAs` here. It was pointing at SITE_REPO, which holds this website
+  // and none of Jostraca, so an entity resolver would read the site's source
+  // as a second repository for the generator. `codeRepository` above already
+  // names the one that ships the software.
+};
+
+const graph = {
+  "@context": "https://schema.org",
+  "@graph": home ? [organization, website, software] : [organization, website],
+};
+---
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(graph)} />
