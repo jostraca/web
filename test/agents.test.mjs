@@ -16,6 +16,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
 
 import worker, { ENTRY_POINTS } from "../src/worker.ts";
 import { makeAssets } from "./assets.mjs";
@@ -204,6 +205,83 @@ test("the og:image the pages promise exists and is the right size", { skip }, ()
   assert.equal(meta(source, "twitter:card"), "summary_large_image");
 });
 
+test("the spec declares every representation a 404 can actually take", { skip }, async () => {
+  // Codex found this one: the page operations declared only JSON for a miss,
+  // but the Worker negotiates the error too. A generated client that trusted
+  // the spec would pick the wrong parser on the recoverable path. Rather than
+  // list the media types again here, drive the Worker and require the spec to
+  // cover whatever comes back, so the two cannot drift apart.
+  const spec = JSON.parse(read("openapi.json"));
+  const env = { ASSETS: makeAssets(DIST) };
+  const ctx = { waitUntil() {} };
+
+  const ACCEPTS = [null, "text/markdown", "text/html", "application/json"];
+  for (const [route, probe] of [
+    ["/{page}.md", "/definitely-not-a-page.md"],
+    ["/{page}", "/definitely-not-a-page"],
+  ]) {
+    const declared = Object.keys(spec.paths[route].get.responses["404"].content);
+    for (const accept of ACCEPTS) {
+      const request = new Request(`https://jostraca.org${probe}`, {
+        headers: accept ? { accept } : {},
+      });
+      const response = await worker.fetch(request, env, ctx);
+      assert.equal(response.status, 404, `${probe} with Accept:${accept}`);
+      const got = response.headers.get("content-type").split(";")[0].trim();
+      assert.ok(
+        declared.includes(got),
+        `${route} 404 returns ${got} for Accept:${accept}, but the spec declares only ${declared.join(", ")}`,
+      );
+    }
+  }
+});
+
+test("the content API is versioned independently of the package", { skip }, () => {
+  const spec = JSON.parse(read("openapi.json"));
+  const pin = createRequire(import.meta.url)("jostraca/package.json").version;
+  assert.match(spec.info.version, /^\d+\.\d+\.\d+$/, "info.version must be semver");
+  // info.version identifies the API document. Tying it to the package pin let
+  // the surface change while the advertised version stood still, and let a
+  // package bump announce an API change that never happened.
+  assert.notEqual(spec.info.version, pin, "info.version is still the package pin");
+});
+
+test("the JSON-LD makes no claim it cannot support", { skip }, () => {
+  const graph = graphOf("index.html");
+  const app = graph["@graph"].find((n) => [].concat(n["@type"]).includes("SoftwareApplication"));
+
+  // schema.org's operatingSystem means Windows/macOS/Linux. Putting the
+  // language runtimes there made consumers report nonsense OS compatibility;
+  // they belong in runtimePlatform, which is where they now are.
+  assert.equal(app.operatingSystem, undefined, "operatingSystem must not carry runtimes");
+  assert.ok(app.runtimePlatform?.length, "the runtimes still belong in runtimePlatform");
+
+  // The site's own repository ships none of the software, so listing it as
+  // sameAs invites an entity resolver to treat it as a second source repo.
+  const sameAs = [].concat(app.sameAs ?? []);
+  assert.ok(
+    !sameAs.some((u) => u.includes("/web")),
+    `the product node points at the website repository: ${sameAs.join(", ")}`,
+  );
+  assert.ok(app.codeRepository, "the real repository is still named");
+});
+
+test("the shared card's alt text describes the card", { skip }, () => {
+  // One image serves every page, so its alt text must describe the image and
+  // not the page it hangs off. Substituting the page description told a screen
+  // reader that /privacy's card was about data collection.
+  const alt = meta(html("index.html"), "og:image:alt");
+  assert.ok(alt, "og:image:alt is missing");
+  for (const page of ["why/index.html", "privacy/index.html", "docs/tutorial/index.html"]) {
+    assert.equal(meta(html(page), "og:image:alt"), alt, `${page}: alt text differs per page`);
+    assert.notEqual(
+      meta(html(page), "og:image:alt"),
+      meta(html(page), "og:description"),
+      `${page}: alt text is just the page description`,
+    );
+  }
+});
+
 test("the trust pages carry enough content to be believed", { skip }, () => {
   for (const page of ["about", "contact", "privacy"]) {
     const source = html(join(page, "index.html"));
@@ -223,6 +301,14 @@ test("llms.txt tells an agent when to reach for Jostraca", { skip }, () => {
   assert.match(index, /Good fits:/);
   assert.match(index, /Poor fits/);
   assert.match(index, /npm install jostraca/, "an agent needs the install line");
+
+  // No count typed into prose: the drift guard on COMPONENTS keeps the list
+  // honest, and nothing keeps a sentence honest.
+  assert.doesNotMatch(index, /\b(ten|eleven|nine) components\b/i, "component count spelled out");
+
+  // And no absolute "collects nothing": with PUBLIC_CF_BEACON set the site
+  // does collect cookieless aggregate analytics, and the privacy page says so.
+  assert.doesNotMatch(index, /collects, which is nothing/, "absolute privacy claim");
   // And it must point at the machine surfaces, which is how they get found.
   for (const surface of ["/openapi.json", "/versions.json", "/llms-full.txt"]) {
     assert.ok(index.includes(surface), `llms.txt does not name ${surface}`);

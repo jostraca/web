@@ -16,6 +16,15 @@ export const SITE_DESCRIPTION =
 export const SITE_HOST = "jostraca.org";
 export const SITE_URL = `https://${SITE_HOST}`;
 
+// The version of the CONTENT API this site serves -- /openapi.json's
+// `info.version`. Semver over the surface described there: bump the minor for
+// a new operation or field, the major for a breaking change to an existing
+// one. Deliberately NOT the package pin: `info.version` identifies the API
+// document, so tying it to JOSTRACA_VERSION let the surface change while the
+// advertised version stood still, and let a package bump announce an API
+// change that never happened.
+export const CONTENT_API_VERSION = "1.0.0";
+
 export const GITHUB_REPO = "https://github.com/jostraca/jostraca";
 
 // This site's own repository. Separate from the generator's, and named

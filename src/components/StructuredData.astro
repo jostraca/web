@@ -5,7 +5,6 @@ import {
   SITE_DESCRIPTION,
   SITE_URL,
   GITHUB_REPO,
-  SITE_REPO,
   NPM_PACKAGE,
   GO_PKG_DOC,
   JOSTRACA_VERSION,
@@ -73,7 +72,10 @@ const software = {
   description: SITE_DESCRIPTION,
   url: SITE_URL,
   applicationCategory: "DeveloperApplication",
-  operatingSystem: "Node.js, Go",
+  // No `operatingSystem`. It means what it says -- Windows, macOS, Linux --
+  // and putting the language runtimes there made consumers report nonsense OS
+  // compatibility. The runtimes are `runtimePlatform`, below, where they mean
+  // something; a cross-platform library is better off saying nothing here.
   softwareVersion: JOSTRACA_VERSION,
   codeRepository: GITHUB_REPO,
   downloadUrl: NPM_PACKAGE,
@@ -98,7 +100,10 @@ const software = {
   publisher: { "@id": ORG },
   softwareHelp: { "@type": "CreativeWork", url: `${SITE_URL}/docs` },
   discussionUrl: `${GITHUB_REPO}/issues`,
-  sameAs: [SITE_REPO],
+  // No `sameAs` here. It was pointing at SITE_REPO, which holds this website
+  // and none of Jostraca, so an entity resolver would read the site's source
+  // as a second repository for the generator. `codeRepository` above already
+  // names the one that ships the software.
 };
 
 const graph = {

@@ -7,7 +7,7 @@ import {
   GITHUB_REPO,
   SITE_REPO,
   GO_MODULE,
-  JOSTRACA_VERSION,
+  CONTENT_API_VERSION,
 } from "../consts";
 
 // /openapi.json — the machine surface of this site, described in OpenAPI 3.1.
@@ -118,7 +118,9 @@ export const GET: APIRoute = async ({ site }) => {
         "Read `/llms.txt` first: it is the smallest complete map of the site.",
         "To use Jostraca itself, install the package — see `externalDocs`.",
       ].join("\n"),
-      version: JOSTRACA_VERSION,
+      // The content API's own version, not the generator's. See
+      // CONTENT_API_VERSION in consts.ts for which one moves when.
+      version: CONTENT_API_VERSION,
       license: { name: "MIT", identifier: "MIT" },
       contact: { name: "Jostraca issues", url: `${GITHUB_REPO}/issues` },
     },
@@ -253,9 +255,12 @@ export const GET: APIRoute = async ({ site }) => {
               content: { "text/markdown": { schema: { type: "string" } } },
             },
             "404": {
-              description: "No such page.",
+              description:
+                "No such page, in whichever representation the caller asked for: JSON under `Accept: application/json`, the designed HTML page under `Accept: text/html`, and markdown otherwise — including for a caller that named nothing.",
               content: {
                 "application/json": { schema: { $ref: "#/components/schemas/Error" } },
+                "text/markdown": { schema: { type: "string" } },
+                "text/html": { schema: { type: "string" } },
               },
             },
           },
@@ -299,10 +304,11 @@ export const GET: APIRoute = async ({ site }) => {
             },
             "404": {
               description:
-                "No such page, in the representation the caller asked for. JSON when `Accept: application/json`, otherwise markdown or the HTML page.",
+                "No such page, in whichever representation the caller asked for: JSON under `Accept: application/json`, the designed HTML page under `Accept: text/html`, and markdown otherwise — including for a caller that named nothing.",
               content: {
                 "application/json": { schema: { $ref: "#/components/schemas/Error" } },
                 "text/markdown": { schema: { type: "string" } },
+                "text/html": { schema: { type: "string" } },
               },
             },
           },

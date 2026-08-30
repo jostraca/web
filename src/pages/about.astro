@@ -52,11 +52,15 @@ const description =
   </p>
 
   <p>
-    This site runs its examples against version <code>{JOSTRACA_VERSION}</code>.
-    The documentation is synced from the generator's own repository, where every
-    snippet on these pages is executed in a temporary directory by a real process
-    and compared against the file tree it wrote. A page here cannot drift from the
-    code without failing that build.
+    Two versions matter here, and they are not always the same one. This site
+    runs its own authored examples against <code>{JOSTRACA_VERSION}</code>, the
+    package it pins. The documentation pages are synced from the generator's
+    repository, where each snippet is executed in a temporary directory by a
+    real process and compared against the file tree it wrote — against the code
+    at that commit, which can be ahead of the published package. So a synced
+    page cannot drift from the generator, but it can describe a release you have
+    not installed yet. <a href="/versions.json">/versions.json</a> reports the
+    pin, and each page links the file it came from.
   </p>
 
   <h2 id="who">Who maintains it</h2>

@@ -10,6 +10,7 @@ import {
   GO_PKG_DOC,
   JOSTRACA_VERSION,
   HOWTO_GROUPS,
+  COMPONENTS,
 } from "../consts";
 
 // /llms.txt — the site index, written for agents.
@@ -61,7 +62,7 @@ export const GET: APIRoute = async ({ site }) => {
     "To use it: `npm install jostraca` (TypeScript/Node) or",
     "`go get github.com/jostraca/jostraca/go` (Go), then read",
     "[the tutorial](" + origin + "/docs/tutorial.md). The API surface is",
-    "small enough to hold in one page: ten components, one `generate()` call.",
+    `small enough to hold in one page: ${COMPONENTS.length} components, one \`generate()\` call.`,
     "",
     "## Documentation",
     "",
@@ -108,7 +109,7 @@ export const GET: APIRoute = async ({ site }) => {
     "",
     `- [${origin}/about.md](${origin}/about.md): what Jostraca is, who maintains it, and how it is tested.`,
     `- [${origin}/contact.md](${origin}/contact.md): how to report a bug, a security issue, or a documentation error.`,
-    `- [${origin}/privacy.md](${origin}/privacy.md): what this site collects, which is nothing.`,
+    `- [${origin}/privacy.md](${origin}/privacy.md): what this site collects — no cookies and no personal data, with optional cookieless aggregate analytics.`,
     "",
   );
 
