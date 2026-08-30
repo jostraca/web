@@ -2,7 +2,14 @@
 import { SITE_TITLE, NAV, GITHUB_REPO } from "../consts";
 
 const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
-const isCurrent = (href: string) => path === href || path.startsWith(href + "/");
+
+// Exact match only. A prefix test reads well until you are on
+// /docs/tutorial, where it marks BOTH "Docs" and "Tutorial" as
+// aria-current="page" -- two current pages, which is not a thing, and
+// which assistive technology announces as such. The nav's section
+// entries stay unmarked on their children; the sidebar is what shows
+// where you are inside a section.
+const isCurrent = (href: string) => path === href;
 ---
 
 <header>

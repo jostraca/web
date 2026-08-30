@@ -26,7 +26,7 @@
 // a CI job or a Cloudflare build that clones only this repository. It is a
 // contributor-side gate.
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, statSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import { join, dirname, resolve, posix } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -35,7 +35,12 @@ const SITE = resolve(HERE, "..");
 
 const REPO = "https://github.com/jostraca/jostraca";
 // The generator's default branch is `master`. A blob URL on `main` 404s.
+//
+// And GitHub serves a directory under /tree/, not /blob/: a /blob/ URL for
+// `ts/` or `test/spec/` renders an error page rather than a listing. The
+// upstream index links three such directories, so this is not hypothetical.
 const BLOB = `${REPO}/blob/master/`;
+const TREE = `${REPO}/tree/master/`;
 
 /**
  * The pages this site renders, in sidebar order.
@@ -143,6 +148,37 @@ function routeFor(repoPath) {
   return guide ? `/how-to/${guide[1]}` : null;
 }
 
+/**
+ * The heading ids a markdown document will have once rendered.
+ *
+ * The same slug rule rehype-slug applies: take the heading text, lowercase
+ * it, drop anything that is not a word character, space or hyphen, and turn
+ * runs of space into hyphens, disambiguating repeats with a numeric suffix.
+ * A code span contributes its text, which is the case that matters here:
+ * `## \`isbinext\` and \`isbincontent\`` becomes `isbinext-and-isbincontent`,
+ * so a link written to `#isbinext` resolves to nothing at all.
+ */
+function headingIds(markdown) {
+  const ids = new Set();
+  const seen = new Map();
+  for (const line of markdown.split("\n")) {
+    const m = /^(#{1,6})\s+(.+?)\s*$/.exec(line);
+    if (!m) continue;
+    const base = m[2]
+      .replace(/`/g, "")
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .trim()
+      .replace(/\s+/g, "-");
+    const n = seen.get(base) ?? 0;
+    seen.set(base, n + 1);
+    ids.add(n === 0 ? base : `${base}-${n}`);
+  }
+  return ids;
+}
+
+
 /** Split a link target into its path and its `#fragment` (if any). */
 function splitHash(target) {
   const i = target.indexOf("#");
@@ -197,12 +233,31 @@ export function rewriteTarget(target, file, root, baseDir = "docs") {
     );
   }
 
+  // A fragment has to name a heading that exists. Checking the path alone
+  // lets `#isbinext` sail through when the heading is `isbinext-and-
+  // isbincontent`, and the broken anchor is then committed as though the
+  // link checker had approved it.
+  if (hash && root && repoPath.endsWith(".md")) {
+    const ids = headingIds(readFileSync(join(root, repoPath), "utf8"));
+    const frag = decodeURIComponent(hash.slice(1));
+    if (!ids.has(frag)) {
+      throw new Error(
+        `sync-docs: broken anchor ${JSON.stringify(target)} in ${baseDir}/${file} — ` +
+          `${repoPath} has no heading with id ${JSON.stringify(frag)}.`,
+      );
+    }
+  }
+
   // A sibling page this site renders.
   const route = routeFor(repoPath);
   if (route) return route + hash;
 
-  // Anything else in the repository: link to the source of truth.
-  return BLOB + repoPath + hash;
+  // Anything else in the repository: link to the source of truth, as a blob
+  // or a tree depending on which it is.
+  const isDir = root
+    ? statSync(join(root, repoPath)).isDirectory()
+    : path.endsWith("/");
+  return (isDir ? TREE : BLOB) + repoPath + hash;
 }
 
 /** YAML-safe double-quoted scalar. */

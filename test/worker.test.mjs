@@ -258,3 +258,19 @@ test("public data answers cross-origin", { skip: built ? false : "no dist/" }, a
     assert.equal(res.headers.get("access-control-allow-origin"), "*", path);
   }
 });
+
+test("negotiated markdown answers cross-origin too", { skip: built ? false : "no dist/" }, async () => {
+  // The negotiated response returns from its own branch, before the
+  // decoration that gives the machine surface its CORS header. It went out
+  // without one: the fetch succeeded and the browser withheld the body, on
+  // the exact surface this Worker exists to provide. The direct .md form
+  // was fine the whole time, which is what made it easy to miss.
+  const negotiated = await get("/docs/tutorial", { accept: "text/markdown" });
+  assert.equal(negotiated.status, 200);
+  assert.match(negotiated.headers.get("content-type"), /text\/markdown/);
+  assert.equal(negotiated.headers.get("access-control-allow-origin"), "*");
+
+  const direct = await get("/docs/tutorial.md");
+  assert.equal(direct.status, 200);
+  assert.equal(direct.headers.get("access-control-allow-origin"), "*");
+});

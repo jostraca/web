@@ -344,6 +344,14 @@ export default {
         response.headers.set("content-type", "text/markdown; charset=utf-8");
         response.headers.set("vary", "Accept, Accept-Encoding");
         response.headers.set("content-location", twin);
+        // This branch returns before the decoration in step 4, so it has to
+        // set CORS itself. The body is the same markdown a direct request
+        // for `twin` would serve, and that path DOES get the header (via
+        // isPublicData's .md rule) -- so without this the negotiated
+        // surface, which is the one this Worker exists for, was the one
+        // surface a cross-origin reader could not actually read. The fetch
+        // succeeds and the body is withheld from the caller.
+        response.headers.set("access-control-allow-origin", "*");
         return response;
       }
       twinMissing = true;

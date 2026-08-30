@@ -376,6 +376,20 @@ test("the component list is exactly the pinned package's, no more and no less", 
   );
 });
 
+test("no page writes the mode count out in prose", () => {
+  // Same rule as below, for the same reason, over the other list consts.ts
+  // owns. MODES is not held to the package the way COMPONENTS is -- the
+  // existing-file modes are option flags, not exports -- so a typed count
+  // here would go stale silently and in two places at once.
+  for (const path of authored) {
+    assert.doesNotMatch(
+      readFileSync(path, "utf8"),
+      /\b(?:\d+|three|four|five|six|seven)\s+modes\b/i,
+      `${relative(ROOT, path)} states a mode count in prose; render MODES.length`,
+    );
+  }
+});
+
 test("no page writes the component count out in prose", () => {
   // The list is held to the package by the test above, so it changes when the
   // package does. A number typed into a sentence does not, and nothing else

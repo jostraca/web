@@ -1,6 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
-import { GITHUB_REPO } from "../consts";
+import { GITHUB_REPO, MODES } from "../consts";
 
 // /why — the argument for the project, in the project's own voice.
 // Authored here (no upstream counterpart), so every example below is a claim
@@ -147,8 +147,8 @@ const description =
     </p>
 
     <p>
-      <code>merge</code> is one of five modes, and the modest ones earn their
-      keep more often: <code>preserve</code> writes the new version and leaves
+      <code>merge</code> is one of {MODES.length} modes, and the modest ones
+      earn their keep more often: <code>preserve</code> writes the new version and leaves
       the old bytes in a sibling file, <code>present</code> leaves the file
       alone and writes the new version beside it, <code>diff</code> hands back
       an annotated two-way diff. The modes are checked in that order, so

@@ -318,7 +318,7 @@ two copies of the package interoperate.
 ## Parity, and where it is pinned
 
 Behaviour shared by both stacks lives in
-[`test/spec/`](https://github.com/jostraca/jostraca/blob/master/test/spec/): language-neutral TSV cases that
+[`../test/spec/`](https://github.com/jostraca/jostraca/tree/master/test/spec/): language-neutral TSV cases that
 `ts/test/spec.test.ts` and `go/spec_test.go` both read. An unknown case
 is a hard failure on both sides, so a row cannot be silently skipped by
 one.

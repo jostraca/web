@@ -232,7 +232,7 @@ whether your generator runs on one machine or many.
 
 TypeScript is canonical; Go is a port that aims at byte-identical output
 for the same logical input. The parity is held by a shared,
-language-neutral corpus in [`test/spec/`](https://github.com/jostraca/jostraca/blob/master/test/spec/) that both
+language-neutral corpus in [`../test/spec/`](https://github.com/jostraca/jostraca/tree/master/test/spec/) that both
 test suites read, so a case added there is picked up by both runners
 with no code change, and an unknown case is a hard failure on both sides
 rather than a silent skip on one.

@@ -18,14 +18,14 @@ than a single destructive default.
 
 This repository ships **two implementations kept in parity**:
 
-- **TypeScript** in [`ts/`](https://github.com/jostraca/jostraca/blob/master/ts/) — the canonical implementation,
+- **TypeScript** in [`../ts/`](https://github.com/jostraca/jostraca/tree/master/ts/) — the canonical implementation,
   published to npm as [`jostraca`](https://www.npmjs.com/package/jostraca).
-- **Go** in [`go/`](https://github.com/jostraca/jostraca/blob/master/go/) — a port
+- **Go** in [`../go/`](https://github.com/jostraca/jostraca/tree/master/go/) — a port
   (`github.com/jostraca/jostraca/go`) that aims at byte-identical
   output for the same logical input.
 
 Both are checked against one language-neutral corpus in
-[`test/spec/`](https://github.com/jostraca/jostraca/blob/master/test/spec/), and every example in these pages is
+[`../test/spec/`](https://github.com/jostraca/jostraca/tree/master/test/spec/), and every example in these pages is
 executed by `ts/test/docs.test.ts`: each snippet runs in a temp
 directory and the pages state the tree it actually wrote.
 
@@ -85,7 +85,7 @@ See [generate in memory](/how-to/generate-in-memory).
 - [`CLAUDE.md`](https://github.com/jostraca/jostraca/blob/master/CLAUDE.md) — the contributor guide: layout, build
   and test commands, and the rule that TypeScript is the source of
   truth.
-- [`test/spec/`](https://github.com/jostraca/jostraca/blob/master/test/spec/) — the shared corpus. A change to any
+- [`../test/spec/`](https://github.com/jostraca/jostraca/tree/master/test/spec/) — the shared corpus. A change to any
   pure helper adds a row there rather than a case in one stack's suite.
 - [`go/PORT_PLAN.md`](https://github.com/jostraca/jostraca/blob/master/go/PORT_PLAN.md) — how the Go port was
   built and what it decided.

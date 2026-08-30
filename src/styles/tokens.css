@@ -17,9 +17,15 @@
   whole reason for the indirection.
 
   The launch palette is a neutral grey with a slight cool cast, and a single
-  restrained accent. Every body-text pair below meets WCAG AA (>= 4.5:1) in
-  both themes, so the later brand work starts from a known-good baseline
-  rather than a first attempt.
+  restrained accent. Every ink token clears WCAG AA (>= 4.5:1) against every
+  ground it is used on -- --bg, --bg-raised and --bg-sunken -- in both
+  themes, so the later brand work starts from a known-good baseline rather
+  than a first attempt.
+
+  --grey-500 is the tightest of them and the reason to check rather than
+  eyeball: at #6b757a it was 4.43:1 on --bg, under the line while looking
+  entirely unremarkable, and it carries the small text (sidebar labels,
+  captions, figure captions) where the margin matters most.
 */
 
 :root {
@@ -32,7 +38,7 @@
   --grey-800: #22282b;
   --grey-700: #333b3f;
   --grey-600: #4a5459;
-  --grey-500: #6b757a;
+  --grey-500: #626b70;
   --grey-400: #949da1;
   --grey-300: #bec5c8;
   --grey-200: #d9dee0;

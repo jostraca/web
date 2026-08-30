@@ -36,8 +36,14 @@ export default defineConfig({
           behavior: "append",
           properties: {
             class: "heading-anchor",
-            ariaHidden: "true",
-            tabIndex: -1,
+            // NOT aria-hidden + tabindex="-1", which is the usual pairing
+            // and which global.css contradicts: it reveals the anchor on
+            // :focus-visible, a state an element with tabindex="-1" can
+            // never enter. So the rule was dead and the control was
+            // reachable by mouse only. Exposed instead, with a name --
+            // the visible text is "#", which a screen reader announces as
+            // punctuation or not at all.
+            ariaLabel: "Permalink to this section",
           },
           content: { type: "text", value: "#" },
         },
