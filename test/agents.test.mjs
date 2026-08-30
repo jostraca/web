@@ -13,7 +13,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -119,6 +119,28 @@ test("every page the spec enumerates actually answers", { skip }, () => {
   for (const entry of ["index", "why", "about", "contact", "privacy", "docs", "how-to"]) {
     assert.ok(listed.has(entry), `${entry}.md exists but the spec omits it`);
   }
+});
+
+test("the spec's page list and the built twins agree exactly", { skip }, () => {
+  // The one-directional check above catches a spec that points at a 404. It
+  // cannot catch the opposite, and that is what actually happened on the
+  // sibling site: one enum omitted a published grammar file, another omitted
+  // 121 pages. Both were invisible to every check except this one.
+  const spec = JSON.parse(read("openapi.json"));
+  const listed = [...spec.paths["/{page}.md"].get.parameters[0].schema.enum].sort();
+
+  const twins = [];
+  const walk = (dir, prefix) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) walk(join(dir, entry.name), `${prefix}${entry.name}/`);
+      else if (entry.name.endsWith(".md")) twins.push(prefix + entry.name.replace(/\.md$/, ""));
+    }
+  };
+  walk(DIST, "");
+
+  // 404 is the error page's own twin, not a page of the site.
+  const built = twins.filter((t) => t !== "404").sort();
+  assert.deepEqual(listed, built, "openapi.json and the built markdown twins disagree");
 });
 
 test("the homepage publishes a JSON-LD identity", { skip }, () => {
