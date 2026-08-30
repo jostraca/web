@@ -1,6 +1,6 @@
 # jostraca/web
 
-Source of **[jostraca.dev](https://jostraca.dev)** — the project site and
+Source of **[jostraca.org](https://jostraca.org)** — the project site and
 documentation for [Jostraca](https://github.com/jostraca/jostraca), a code and
 project generator. An [Astro](https://astro.build) site deployed to Cloudflare
 Workers.
@@ -101,7 +101,7 @@ session usually has no Cloudflare credentials (`wrangler whoami` reporting
 "not authenticated" is expected, not broken).
 
 The Worker is **`jostraca-web`**, and `wrangler.json` carries its triggers:
-`jostraca.dev` and `www.jostraca.dev` as custom domains. Keep them there. They
+`jostraca.org` and `www.jostraca.org` as custom domains. Keep them there. They
 are attached by the deploy rather than by clicking, and they belong in the file
 rather than the dashboard: the tabnas site's routes lived only in its dashboard
 for months, which meant nothing in that repository recorded what actually
@@ -112,10 +112,10 @@ Workers on this account, so a 404 there is not evidence a Worker is broken. The
 custom domain is the only way in, which also makes it the only place a deploy
 can be verified.
 
-The domain itself is an assumption. `jostraca.dev` is declared in `SITE_HOST`
-in `src/consts.ts` and in `wrangler.json`'s routes, and confirmed nowhere; a
-maintainer should settle it before the first deploy. Six files name it, so
-grep for the string rather than trusting the constant to cover it.
+`jostraca.org` is declared in `SITE_HOST` in `src/consts.ts` and in
+`wrangler.json`'s routes. Six files name it in all, because four of them
+cannot import the constant; grep for the string rather than trusting the
+constant to cover them.
 
 ## Layout
 

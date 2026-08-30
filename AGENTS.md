@@ -1,6 +1,6 @@
 # Agents Guide — jostraca/web
 
-The site behind **[jostraca.dev](https://jostraca.dev)**. Read this before
+The site behind **[jostraca.org](https://jostraca.org)**. Read this before
 changing anything; the README is the shorter version for a human arriving cold.
 
 Jostraca is a code and project generator: you declare an output file tree with
@@ -182,7 +182,7 @@ machine callers:
    browser client cannot read cross-origin is no use at the moment it is
    needed.
 
-A redirect sits alongside them. `www.jostraca.dev` is a second custom domain
+A redirect sits alongside them. `www.jostraca.org` is a second custom domain
 on this same Worker, so without one permanent redirect both hosts serve every
 page and the apex is canonical only by `<link rel="canonical">`, which search
 engines honour and nothing else does.
@@ -222,6 +222,20 @@ component.
 
 Fonts are a system stack: no files, no preloads, no decision to revisit.
 
+## The domain
+
+`jostraca.org`. It is declared in `SITE_HOST` in `src/consts.ts` and in
+`wrangler.json`'s routes, and repeated as a literal in `astro.config.mjs`,
+`src/worker.ts`, `src/pages/404.astro` and `tools/gen-markdown.mjs` -- four
+files that cannot import the constant, because the Worker bundle and the
+Astro config both load before it and the markdown tool runs outside the site
+entirely. Changing it means all six. Grep for the string; the constant does
+not cover them.
+
+`www.jostraca.org` is the second custom domain and redirects to the apex,
+which the Worker does rather than Cloudflare, so that the redirect is in the
+repository and testable.
+
 ## Deployment
 
 **Merging to `main` is the deploy step.** Cloudflare builds and publishes from
@@ -235,7 +249,7 @@ manual recovery. An agent session usually has no Cloudflare credentials, and
 `wrangler whoami` reporting "not authenticated" is expected.
 
 The Worker is `jostraca-web`, and `wrangler.json` carries its triggers:
-`jostraca.dev` and `www.jostraca.dev` as custom domains, attached by the
+`jostraca.org` and `www.jostraca.org` as custom domains, attached by the
 deploy rather than by clicking. Keep them in the file. On tabnas the routes
 lived only in the Cloudflare dashboard until 2026-08-19, which meant nothing in that repository recorded what
 actually served the site.
@@ -270,12 +284,8 @@ Still to come, in rough order:
 - **Search** (Pagefind).
 - **Brand**: logo, palette, typography. The tokens file is the seam.
 - **Authored pages**: comparisons, and an FAQ.
-- **The domain.** `jostraca.dev` is an assumption, confirmed nowhere. A
-  maintainer should settle it before the first deploy. It is declared in
-  `SITE_HOST` in `src/consts.ts` and in `wrangler.json`'s routes, and repeated
-  as a literal in `astro.config.mjs`, `src/worker.ts`, `src/pages/404.astro`
-  and `tools/gen-markdown.mjs`. Changing it means all six; grep for the string
-  rather than trusting the constant to cover it.
+- **Cloudflare itself.** No project exists for this repository yet, so the
+  custom domains in `wrangler.json` are declared and not yet attached.
 
 Not coming, either. The generator has no CLI, no REPL, no language of its own,
 no error-code registry and no published grammar, so this site has no `/errors`

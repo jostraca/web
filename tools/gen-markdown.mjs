@@ -166,7 +166,7 @@ for (const file of files) {
 
   // Site-relative links are useless to something reading the markdown out of
   // band, so resolve them against the page's own canonical URL.
-  const origin = canonical ? new URL(canonical).origin : "https://jostraca.dev";
+  const origin = canonical ? new URL(canonical).origin : "https://jostraca.org";
   for (const [selector, attribute] of [
     ["a[href]", "href"],
     ["img[src]", "src"],

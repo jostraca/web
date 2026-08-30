@@ -27,13 +27,13 @@
 // or fonts.
 
 /**
- * The canonical host. `www.jostraca.dev` is a second custom domain on this
+ * The canonical host. `www.jostraca.org` is a second custom domain on this
  * same Worker (see wrangler.json), so without a redirect both hosts serve
  * every page and the apex is canonical only by `<link rel="canonical">` —
  * which search engines honour and nothing else does. One permanent redirect
  * makes it canonical to anything that keys on the host.
  */
-const CANONICAL_HOST = "jostraca.dev";
+const CANONICAL_HOST = "jostraca.org";
 
 /** Paths the Worker never handles, even if run_worker_first sends them here. */
 const ASSET_PREFIXES = ["/_astro/", "/fonts/", "/brand/"];
@@ -320,7 +320,7 @@ export default {
           code: "method_not_allowed",
           message: "Method Not Allowed",
           hint:
-            `${method} is not supported. jostraca.dev is a read-only documentation site: every ` +
+            `${method} is not supported. jostraca.org is a read-only documentation site: every ` +
             "endpoint answers GET and HEAD. Jostraca generates files in your own process, from " +
             "the npm package or the Go module; nothing here runs it for you.",
         },

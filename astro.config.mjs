@@ -9,7 +9,7 @@ import cloudflare from "@astrojs/cloudflare";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://jostraca.dev",
+  site: "https://jostraca.org",
   // Fully static: nothing renders at request time. The Worker in front of
   // the assets (src/worker.ts) does the per-request work — content
   // negotiation, JSON errors, the canonical-host redirect.

@@ -180,12 +180,12 @@ test("a twin's frontmatter title is the page's name, not the browser tab's", { s
 
 const env = { ASSETS: makeAssets(DIST) };
 const get = (path, headers = {}, method = "GET") =>
-  worker.fetch(new Request(`https://jostraca.dev${path}`, { method, headers }), env);
+  worker.fetch(new Request(`https://jostraca.org${path}`, { method, headers }), env);
 
 test("www redirects to the apex, permanently", { skip: built ? false : "no dist/" }, async () => {
-  const res = await worker.fetch(new Request("https://www.jostraca.dev/why"), env);
+  const res = await worker.fetch(new Request("https://www.jostraca.org/why"), env);
   assert.equal(res.status, 301);
-  assert.equal(res.headers.get("location"), "https://jostraca.dev/why");
+  assert.equal(res.headers.get("location"), "https://jostraca.org/why");
 });
 
 test("Accept: text/markdown serves the twin from the page's own URL", { skip: built ? false : "no dist/" }, async () => {
@@ -205,7 +205,7 @@ test("a browser gets HTML, via the asset server's trailing-slash redirect", { sk
   // html_handling: "auto-trailing-slash" and redirects /why -> /why/.
   const hop = await get("/why", { accept: "text/html,application/xhtml+xml,*/*;q=0.8" });
   assert.equal(hop.status, 307);
-  assert.equal(new URL(hop.headers.get("location"), "https://jostraca.dev").pathname, "/why/");
+  assert.equal(new URL(hop.headers.get("location"), "https://jostraca.org").pathname, "/why/");
 
   const res = await get("/why/", { accept: "text/html,application/xhtml+xml,*/*;q=0.8" });
   assert.equal(res.status, 200);

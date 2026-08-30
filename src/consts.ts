@@ -9,9 +9,11 @@ export const SITE_DESCRIPTION =
   "second run can preserve, present, diff or merge against the code a human " +
   "edited in between.";
 
-// The site's own domain. Assumed, not confirmed: the wrangler routes and
-// the sitemap are the only places it matters, and both read it from here.
-export const SITE_HOST = "jostraca.dev";
+// The site's own domain, confirmed by the maintainer. Six files name it --
+// this constant, the wrangler routes, and four literals that cannot import
+// it (see AGENTS.md, "The domain"), so grep the string rather than trusting
+// this to cover them.
+export const SITE_HOST = "jostraca.org";
 export const SITE_URL = `https://${SITE_HOST}`;
 
 export const GITHUB_REPO = "https://github.com/jostraca/jostraca";

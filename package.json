@@ -1,6 +1,6 @@
 {
   "name": "jostraca-web",
-  "description": "Source of jostraca.dev — the project site and documentation for Jostraca.",
+  "description": "Source of jostraca.org — the project site and documentation for Jostraca.",
   "private": true,
   "type": "module",
   "engines": {

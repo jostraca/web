@@ -4,8 +4,8 @@
 	"compatibility_flags": ["nodejs_compat"],
 	"main": "./src/worker.ts",
 	"routes": [
-		{ "pattern": "jostraca.dev", "custom_domain": true },
-		{ "pattern": "www.jostraca.dev", "custom_domain": true }
+		{ "pattern": "jostraca.org", "custom_domain": true },
+		{ "pattern": "www.jostraca.org", "custom_domain": true }
 	],
 	"assets": {
 		"directory": "./dist",
