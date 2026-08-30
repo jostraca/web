@@ -1,0 +1,78 @@
+---
+import Prose from "../layouts/Prose.astro";
+import { SITE_REPO, SITE_HOST } from "../consts";
+
+const title = "Privacy";
+const description =
+  "What jostraca.org collects, what it does not, and who processes the " +
+  "request when you read a page.";
+---
+
+<Prose
+  title={title}
+  description={description}
+  lede="This is a documentation site. It has no accounts, no forms and no cookies, and it asks you for nothing."
+>
+  <h2 id="collect">What this site collects</h2>
+
+  <p>
+    Nothing you type, because there is nothing to type into. There is no sign-up,
+    no login, no comment box, no newsletter and no contact form anywhere on
+    {SITE_HOST}. The site sets no cookies and writes nothing to your browser's
+    storage. You can read every page, and every page's markdown twin, without
+    identifying yourself in any way.
+  </p>
+
+  <h2 id="hosting">Who serves the pages</h2>
+
+  <p>
+    The site runs on Cloudflare Workers. Delivering a page necessarily means
+    Cloudflare handles the request, and in doing so it processes the usual
+    request metadata — your IP address, the URL you asked for, your user agent —
+    to route the response and to protect the service from abuse. Cloudflare
+    retains request-level logs for a limited period as part of running the
+    platform. That processing is Cloudflare's, under its own terms; this site
+    neither adds to it nor receives a copy of it in any identifiable form.
+  </p>
+
+  <h2 id="analytics">Analytics</h2>
+
+  <p>
+    The site is built to support Cloudflare Web Analytics, which is cookieless
+    and collects aggregate page-view data without a device identifier and
+    without tracking you across other sites. It is enabled only when a beacon
+    token is configured at build time; when it is not, the script is not
+    included in the page at all. If you want to know which state the live site
+    is in, read the page source and look for a
+    <code>cloudflareinsights.com</code> script tag — its presence or absence is
+    the whole answer, and it is not something this page can be stale about.
+  </p>
+
+  <h2 id="third-parties">Third parties</h2>
+
+  <p>
+    No third-party fonts, no analytics beyond the above, no tag manager, no
+    embedded video, no advertising, and no social widgets. Every stylesheet,
+    script and font this site uses is served from its own domain, so reading a
+    page does not quietly issue requests to anyone else. Links that leave the
+    site — to GitHub, npm, pkg.go.dev — are ordinary links, and they take you to
+    services with their own privacy policies.
+  </p>
+
+  <h2 id="rights">Your data, and questions about it</h2>
+
+  <p>
+    Because the site holds no personal data of yours, there is nothing here to
+    export, correct or delete. If you have a question about what Cloudflare
+    processes on the way to you, its documentation covers that in detail. If you
+    believe something on this site contradicts what is written here, that is a
+    bug and is worth reporting on
+    <a href={SITE_REPO} rel="noopener">the site repository</a>.
+  </p>
+
+  <p class="footnote">
+    This page describes the site, not the Jostraca software. The generator runs
+    entirely on your own machine, sends nothing anywhere, and has no telemetry
+    of any kind. Last reviewed against the code on this page's own build.
+  </p>
+</Prose>

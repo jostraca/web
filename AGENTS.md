@@ -268,6 +268,7 @@ page cannot express it:
 | Route | Built from |
 |---|---|
 | `/llms.txt`, `/llms-full.txt` | the `docs` and `howto` collections |
+| `/openapi.json` | the collections, plus `markdownTwin` from the Worker |
 | `/versions.json` | the pin, plus the size of each surface |
 | `/robots.txt` | `SITE_URL`, pointing at the sitemap and at `llms.txt` |
 | `/sitemap-index.xml` | the sitemap integration |
@@ -277,6 +278,47 @@ None of them is a second copy of a fact stated elsewhere. `/llms.txt` lists
 the collections rather than a hand-kept index, and `/versions.json` reads the
 pin from the same `JOSTRACA_VERSION` export the footer does.
 
+### `/openapi.json` describes this site, not a product API
+
+Jostraca is a library, not a service. The spec covers the content API the
+site actually serves — the markdown twins, the index documents, the version
+document, and the JSON error shape — and nothing else. Do not add an
+operation for an endpoint that does not exist to make the surface look
+richer: a function-calling agent will try to call it.
+
+Its page enumerations come from the collections and are turned into twin
+paths by `markdownTwin`, imported from the Worker. That import is the point.
+Writing the twin paths out by hand named `docs/index` and `how-to/index`,
+neither of which exists, because `/docs/` twins to `/docs.md`. A spec that
+enumerates a 404 is worse than no spec, and `test/agents.test.mjs` now
+asserts every enumerated page resolves in `dist/`.
+
+### Identity and trust pages
+
+`src/components/StructuredData.astro` emits one JSON-LD `@graph`:
+`Organization` and `WebSite` on every page, plus the `SoftwareApplication`
+product node on the home page only (`<Base home>`).
+
+`ContactPoint.telephone` and `PostalAddress` are **deliberately absent**, and
+a test pins their absence. This is an open source project with no switchboard
+and no office; a schema completeness checker will ask for both, and inventing
+either to satisfy it would publish a false claim about a real person. The
+contact route that does exist — the issue tracker — is what the graph names.
+
+`/about`, `/contact` and `/privacy` are authored pages under
+`src/layouts/Prose.astro`. The privacy page describes what the site actually
+does, so if you add an analytics script, a font CDN or an embed, that page is
+part of the change.
+
+### The Open Graph card
+
+`public/og.png` is committed, and regenerated with `npm run gen-og` when the
+title, tagline or accent changes. The tool reads the strings from
+`src/consts.ts`, the mark from `public/favicon.svg` and the colours from
+`src/styles/tokens.css`, so the card cannot show a tagline the site has
+stopped using. It needs a local Chromium (`CHROMIUM_PATH` overrides the
+search) and is deliberately not part of `npm run build`.
+
 ## Not built yet
 
 Still to come, in rough order:
@@ -284,6 +326,9 @@ Still to come, in rough order:
 - **Search** (Pagefind).
 - **Brand**: logo, palette, typography. The tokens file is the seam.
 - **Authored pages**: comparisons, and an FAQ.
+- **An MCP server.** Would let an agent query the documentation as a tool
+  rather than fetching pages. It is a hosted surface with its own lifecycle,
+  so it is a product decision rather than a file to add here.
 - **Cloudflare itself.** No project exists for this repository yet, so the
   custom domains in `wrangler.json` are declared and not yet attached.
 

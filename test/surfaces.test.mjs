@@ -87,6 +87,23 @@ function linkPaths(text) {
   return [...text.matchAll(/\]\((https?:\/\/[^)\s]+)\)/g)].map((m) => new URL(m[1]).pathname);
 }
 
+/**
+ * One `## ` section of a generated markdown document, heading excluded.
+ *
+ * The index sections are what must match the collections exactly. Prose
+ * elsewhere in llms.txt is free to link a page as a cross-reference -- the
+ * when-to-use section points at the tutorial -- and scanning the whole file
+ * would read that as the tutorial being listed twice.
+ */
+function section(text, heading) {
+  const lines = text.split("\n");
+  const start = lines.findIndex((l) => l.trim() === heading);
+  assert.ok(-1 !== start, `llms.txt has no ${heading} section`);
+  const rest = lines.slice(start + 1);
+  const end = rest.findIndex((l) => l.startsWith("## "));
+  return (-1 === end ? rest : rest.slice(0, end)).join("\n");
+}
+
 test("llms.txt indexes every documentation page and every guide", { skip }, () => {
   const text = readFileSync(join(DIST, "llms.txt"), "utf8");
   const lines = text.split("\n");
@@ -98,9 +115,8 @@ test("llms.txt indexes every documentation page and every guide", { skip }, () =
     "llms.txt carries no summary blockquote",
   );
 
-  const paths = linkPaths(text);
-  const listed = (prefix) =>
-    paths
+  const listed = (prefix, heading) =>
+    linkPaths(section(text, heading))
       .filter((p) => p === `${prefix}.md` || p.startsWith(`${prefix}/`))
       .map((p) => (p === `${prefix}.md` ? "index" : p.slice(prefix.length + 1).replace(/\.md$/, "")))
       .sort();
@@ -109,12 +125,12 @@ test("llms.txt indexes every documentation page and every guide", { skip }, () =
   // not find, and an index entry with no page behind it is a 404 the site
   // handed out itself.
   assert.deepEqual(
-    listed("/docs"),
+    listed("/docs", "## Documentation"),
     docs.map((d) => d.id).sort(),
     "llms.txt and the docs collection disagree",
   );
   assert.deepEqual(
-    listed("/how-to"),
+    listed("/how-to", "## How-to guides"),
     howto.map((g) => g.id).sort(),
     "llms.txt and the guides disagree",
   );

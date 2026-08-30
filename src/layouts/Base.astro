@@ -7,16 +7,18 @@ import { SITE_TITLE, SITE_TAGLINE, SITE_DESCRIPTION } from "../consts";
 interface Props {
   title?: string;
   description?: string;
+  /** The homepage carries the product node in its JSON-LD graph. */
+  home?: boolean;
 }
 
-const { title, description = SITE_DESCRIPTION } = Astro.props;
+const { title, description = SITE_DESCRIPTION, home = false } = Astro.props;
 const fullTitle = title ? `${title} · ${SITE_TITLE}` : `${SITE_TITLE} — ${SITE_TAGLINE}`;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={fullTitle} description={description} />
+    <BaseHead title={fullTitle} description={description} home={home} />
   </head>
   <body>
     <Header />
