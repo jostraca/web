@@ -1,0 +1,37 @@
+{
+  "name": "jostraca-web",
+  "description": "Source of jostraca.org — the project site and documentation for Jostraca.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "astro": "astro",
+    "build": "astro build && node tools/gen-markdown.mjs",
+    "cf-typegen": "wrangler types",
+    "check": "npm run check-sync && npm run build && tsc && npm test && wrangler deploy --dry-run",
+    "check-sync": "node tools/sync-docs.mjs --check",
+    "deploy": "wrangler deploy",
+    "dev": "astro dev",
+    "preview": "npm run build && wrangler dev",
+    "sync-docs": "node tools/sync-docs.mjs --apply",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "12.6.12",
+    "@astrojs/mdx": "4.3.13",
+    "@astrojs/sitemap": "3.6.1",
+    "astro": "5.16.9",
+    "jostraca": "0.33.1",
+    "typescript": "5.9.3"
+  },
+  "devDependencies": {
+    "linkedom": "^0.18.13",
+    "rehype-autolink-headings": "7.1.0",
+    "rehype-slug": "6.0.0",
+    "turndown": "^7.2.4",
+    "turndown-plugin-gfm": "^1.0.2",
+    "wrangler": "4.88.0"
+  }
+}

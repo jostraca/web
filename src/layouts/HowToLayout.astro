@@ -1,0 +1,131 @@
+---
+import Base from "./Base.astro";
+import { getCollection } from "astro:content";
+import { GITHUB_REPO, HOWTO_GROUPS } from "../consts";
+
+interface Props {
+  title: string;
+  description: string;
+  source: string;
+}
+
+const { title, description, source } = Astro.props;
+
+// The sidebar is the whole collection, grouped by HOWTO_GROUPS order —
+// the same furniture as the docs layout, so a reader moving between the
+// two relearns nothing.
+const all = await getCollection("howto");
+const sorted = all.sort((a, b) => {
+  const ga = HOWTO_GROUPS.findIndex((g) => g.slug === a.data.group);
+  const gb = HOWTO_GROUPS.findIndex((g) => g.slug === b.data.group);
+  return ga - gb || a.data.order - b.data.order;
+});
+const groups = HOWTO_GROUPS.map((g) => ({
+  name: g.name,
+  guides: sorted
+    .filter((p) => p.data.group === g.slug)
+    .map((p) => ({ href: `/how-to/${p.id}`, title: p.data.title })),
+})).filter((g) => g.guides.length > 0);
+
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+---
+
+<Base title={title} description={description}>
+  <div class="howto">
+    <nav class="side" aria-label="How-to guides">
+      <p class="all"><a href="/how-to">All how-to guides</a></p>
+      {groups.map((group) => (
+        <div class="group">
+          <p class="group-name">{group.name}</p>
+          <ul>
+            {group.guides.map((guide) => (
+              <li>
+                <a href={guide.href} aria-current={path === guide.href ? "page" : undefined}>
+                  {guide.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </nav>
+
+    <article>
+      <h1>{title}</h1>
+      <p class="lede">{description}</p>
+      <p class="source">
+        Rendered from
+        <a href={`${GITHUB_REPO}/blob/master/${source}`} rel="noopener"><code>{source}</code></a>
+        in the generator repository — where a correction belongs, and where the
+        test suite runs every example on this page or states why it does not.
+      </p>
+      <slot />
+    </article>
+  </div>
+</Base>
+
+<style>
+  .howto {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding-top: 32px;
+  }
+  @media (min-width: 900px) {
+    .howto {
+      grid-template-columns: 216px minmax(0, 1fr);
+      gap: 48px;
+    }
+    .side {
+      position: sticky;
+      top: 24px;
+      align-self: start;
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+    }
+  }
+  .all {
+    margin: 0 0 12px;
+    font-size: 0.85rem;
+  }
+  .group {
+    margin-bottom: 16px;
+  }
+  .group-name {
+    margin: 0 0 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-faint);
+  }
+  .group ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .group li a {
+    display: block;
+    padding: 3px 0;
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+  .group li a[aria-current="page"] {
+    font-weight: 600;
+  }
+  article {
+    min-width: 0;
+    max-width: 46rem;
+  }
+  .lede {
+    font-size: 1.05rem;
+    color: var(--ink-muted);
+    margin-top: -8px;
+  }
+  .source {
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 16px;
+  }
+</style>

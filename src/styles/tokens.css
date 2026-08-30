@@ -1,0 +1,147 @@
+/*
+  Jostraca design tokens — LAUNCH NEUTRALS.
+
+  Colour, logo and typography are deliberately deferred. This file is the
+  seam that makes deferring cheap, and it is structured in three layers on
+  purpose:
+
+    1. Raw SCALES — the source of truth for a hue, never referenced by a
+       component.
+    2. SEMANTIC tokens (--bg, --ink, --primary, …) — what components
+       actually use. Remapped wholesale between light and dark.
+    3. Nothing else. A component that reaches past layer 2 for a raw scale
+       is a bug, because it will not follow the theme.
+
+  Adopting a real identity later is an edit to layer 1 plus the handful of
+  semantic mappings below — not a sweep through every component. That is the
+  whole reason for the indirection.
+
+  The launch palette is a neutral grey with a slight cool cast, and a single
+  restrained accent. Every ink token clears WCAG AA (>= 4.5:1) against every
+  ground it is used on -- --bg, --bg-raised and --bg-sunken -- in both
+  themes, so the later brand work starts from a known-good baseline rather
+  than a first attempt.
+
+  --grey-500 is the tightest of them and the reason to check rather than
+  eyeball: at #6b757a it was 4.43:1 on --bg, under the line while looking
+  entirely unremarkable, and it carries the small text (sidebar labels,
+  captions, figure captions) where the margin matters most.
+*/
+
+:root {
+  /* 1 ── raw scales ──────────────────────────────────────────────── */
+
+  /* Grey, very slightly cool — chosen, not inherited from #808080. */
+  --grey-950: #0e1113;
+  --grey-900: #14181a;
+  --grey-850: #1a1f22;
+  --grey-800: #22282b;
+  --grey-700: #333b3f;
+  --grey-600: #4a5459;
+  --grey-500: #626b70;
+  --grey-400: #949da1;
+  --grey-300: #bec5c8;
+  --grey-200: #d9dee0;
+  --grey-100: #eceff0;
+  --grey-50: #f6f8f8;
+  --white: #ffffff;
+
+  /* Accent — a deep violet, the favicon's hue. One colour, used sparingly:
+     links, the current nav item, focus rings. Placeholder until the
+     identity lands. Every pair the semantic layer below builds from it
+     clears WCAG AAA (>= 7:1) on its own ground, so the later brand work
+     starts from a known-good baseline rather than a first attempt:
+     --accent-700 on --grey-50 is 10.4:1, --accent-300 on --grey-950 is
+     8.4:1, and white on --accent-700 is higher than both. */
+  --accent-900: #241640;
+  --accent-800: #33205c;
+  --accent-700: #452c7a;
+  --accent-600: #5a3fa8;
+  --accent-500: #6f52c4;
+  --accent-400: #8f76dc;
+  --accent-300: #b3a2ea;
+  --accent-200: #d5cbf5;
+  --accent-100: #ece7fb;
+
+  /* 2 ── semantic tokens ─────────────────────────────────────────── */
+
+  --bg: var(--grey-50);
+  --bg-raised: var(--white);
+  --bg-sunken: var(--grey-100);
+  --bg-code: var(--grey-100);
+
+  --ink: var(--grey-900);
+  --ink-muted: var(--grey-600);
+  --ink-faint: var(--grey-500);
+
+  --rule: var(--grey-200);
+  --rule-strong: var(--grey-300);
+
+  --primary: var(--accent-700);
+  --primary-hover: var(--accent-600);
+  --primary-soft: var(--accent-100);
+  --on-primary: var(--white);
+
+  --focus: var(--accent-600);
+
+  /* Type. A system stack at launch: no font files, no preloads, no
+     decision to revisit when the identity arrives. */
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  --font-head: var(--font-body);
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  --measure: 68ch;
+  --page: 1180px;
+  --radius: 4px;
+}
+
+/*
+  Dark. Only the semantic layer is remapped — the scales above are the same
+  colours, put to different work. The accent lightens because --accent-700 on
+  a dark ground is well under AA.
+*/
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: var(--grey-950);
+    --bg-raised: var(--grey-900);
+    --bg-sunken: var(--grey-850);
+    --bg-code: var(--grey-850);
+
+    --ink: var(--grey-100);
+    --ink-muted: var(--grey-300);
+    --ink-faint: var(--grey-400);
+
+    --rule: var(--grey-800);
+    --rule-strong: var(--grey-700);
+
+    --primary: var(--accent-300);
+    --primary-hover: var(--accent-200);
+    --primary-soft: var(--accent-900);
+    --on-primary: var(--grey-950);
+
+    --focus: var(--accent-300);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: var(--grey-950);
+  --bg-raised: var(--grey-900);
+  --bg-sunken: var(--grey-850);
+  --bg-code: var(--grey-850);
+
+  --ink: var(--grey-100);
+  --ink-muted: var(--grey-300);
+  --ink-faint: var(--grey-400);
+
+  --rule: var(--grey-800);
+  --rule-strong: var(--grey-700);
+
+  --primary: var(--accent-300);
+  --primary-hover: var(--accent-200);
+  --primary-soft: var(--accent-900);
+  --on-primary: var(--grey-950);
+
+  --focus: var(--accent-300);
+}

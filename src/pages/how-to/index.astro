@@ -1,0 +1,90 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getCollection } from "astro:content";
+import { HOWTO_GROUPS } from "../../consts";
+
+// The grouped index of every how-to guide. The guides themselves are
+// synced from the generator repository (docs/how-to/); this page only
+// arranges them, so there is nothing here to drift.
+const all = await getCollection("howto");
+const sorted = all.sort((a, b) => {
+  const ga = HOWTO_GROUPS.findIndex((g) => g.slug === a.data.group);
+  const gb = HOWTO_GROUPS.findIndex((g) => g.slug === b.data.group);
+  return ga - gb || a.data.order - b.data.order;
+});
+const groups = HOWTO_GROUPS.map((g) => ({
+  ...g,
+  guides: sorted.filter((p) => p.data.group === g.slug),
+})).filter((g) => g.guides.length > 0);
+
+const title = "How-to guides";
+const description =
+  "Task-oriented recipes: each guide solves one job you already have in " +
+  "mind, from composing a file tree to regenerating over code you edited.";
+---
+
+<Base title={title} description={description}>
+  <article class="howto-index">
+    <h1>{title}</h1>
+    <p class="lede">
+      Each guide solves one task and assumes you know the basics — the
+      <a href="/docs/tutorial">tutorial</a> teaches those. The guides come from
+      the generator repository, where the test suite runs every example in them
+      or states why it does not.
+    </p>
+
+    {groups.map((group) => (
+      <section>
+        <h2 id={group.slug}>{group.name}</h2>
+        <p class="blurb">{group.blurb}</p>
+        <ul class="cards">
+          {group.guides.map((guide) => (
+            <li>
+              <a href={`/how-to/${guide.id}`}>{guide.data.title}</a>
+              <p>{guide.data.description}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </article>
+</Base>
+
+<style>
+  .howto-index {
+    max-width: 46rem;
+    padding-top: 32px;
+  }
+  .lede {
+    font-size: 1.05rem;
+    color: var(--ink-muted);
+  }
+  section {
+    margin-top: 32px;
+  }
+  .blurb {
+    color: var(--ink-muted);
+    margin-top: -8px;
+  }
+  .cards {
+    list-style: none;
+    margin: 16px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+  .cards li {
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+  }
+  .cards li a {
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .cards li p {
+    margin: 4px 0 0;
+    font-size: 0.9rem;
+    color: var(--ink-muted);
+  }
+</style>
