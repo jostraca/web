@@ -1,0 +1,20 @@
+{
+	"name": "jostraca-web",
+	"compatibility_date": "2025-10-08",
+	"compatibility_flags": ["nodejs_compat"],
+	"main": "./src/worker.ts",
+	"routes": [
+		{ "pattern": "jostraca.dev", "custom_domain": true },
+		{ "pattern": "www.jostraca.dev", "custom_domain": true }
+	],
+	"assets": {
+		"directory": "./dist",
+		"binding": "ASSETS",
+		"not_found_handling": "none",
+		"run_worker_first": ["/*", "!/_astro/*", "!/fonts/*", "!/brand/*"]
+	},
+	"observability": {
+		"enabled": true
+	},
+	"upload_source_maps": true
+}

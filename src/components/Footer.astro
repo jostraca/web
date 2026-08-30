@@ -1,0 +1,63 @@
+---
+import { GITHUB_REPO, NPM_PACKAGE, GO_PKG_DOC, AUTHOR, JOSTRACA_VERSION } from "../consts";
+const year = new Date().getFullYear();
+---
+
+<footer>
+  <div class="inner">
+    <p class="links">
+      <a href={GITHUB_REPO} rel="noopener">Source</a>
+      <a href={NPM_PACKAGE} rel="noopener">npm</a>
+      <a href={GO_PKG_DOC} rel="noopener">Go</a>
+      <a href="/llms.txt">llms.txt</a>
+      <a href={`${GITHUB_REPO}/blob/master/LICENSE`} rel="noopener">MIT</a>
+    </p>
+
+    <p class="meta">
+      Jostraca {JOSTRACA_VERSION} · &copy; {year}
+      <a href={AUTHOR.url} rel="noopener">{AUTHOR.name}</a>
+    </p>
+
+    <p class="note">
+      The documentation on this site is rendered from
+      <a href={`${GITHUB_REPO}/tree/master/docs`} rel="noopener">the generator repository</a>,
+      where every example is executed by the test suite. Each page is also
+      available as markdown — append <code>.md</code>, or send
+      <code>Accept: text/markdown</code>.
+    </p>
+  </div>
+</footer>
+
+<style>
+  footer {
+    border-top: 1px solid var(--rule);
+    background: var(--bg-raised);
+    margin-top: auto;
+  }
+  .inner {
+    max-width: var(--page);
+    margin: 0 auto;
+    padding: 28px 24px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 0;
+  }
+  .links a {
+    font-size: 0.94rem;
+  }
+  .meta,
+  .note {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--ink-muted);
+  }
+  .note {
+    max-width: var(--measure);
+  }
+</style>

@@ -1,0 +1,90 @@
+---
+import { SITE_TITLE, NAV, GITHUB_REPO } from "../consts";
+
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const isCurrent = (href: string) => path === href || path.startsWith(href + "/");
+---
+
+<header>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="bar">
+    <a class="brand" href="/">
+      <strong>{SITE_TITLE}</strong>
+    </a>
+
+    <nav aria-label="Primary">
+      <ul>
+        {NAV.map((item) => (
+          <li>
+            <a href={item.href} aria-current={isCurrent(item.href) ? "page" : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))}
+        <li>
+          <a href={GITHUB_REPO} rel="noopener">GitHub</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  header {
+    border-bottom: 1px solid var(--rule);
+    background: var(--bg-raised);
+  }
+
+  .bar {
+    max-width: var(--page);
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 12px 28px;
+  }
+
+  .brand {
+    text-decoration: none;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .brand strong {
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+  }
+  nav {
+    margin-left: auto;
+  }
+  nav ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin: 0;
+    padding: 0;
+    max-width: none;
+  }
+  nav a {
+    text-decoration: none;
+    color: var(--ink-muted);
+    font-size: 0.94rem;
+  }
+  nav a:hover {
+    color: var(--primary);
+  }
+  nav a[aria-current="page"] {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    nav {
+      margin-left: 0;
+      width: 100%;
+    }
+  }
+</style>

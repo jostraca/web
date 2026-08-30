@@ -1,0 +1,311 @@
+---
+import Base from "../layouts/Base.astro";
+import {
+  COMPONENTS,
+  MODES,
+  GITHUB_REPO,
+  GO_MODULE,
+  JOSTRACA_VERSION,
+} from "../consts";
+
+// The examples below are executed against the pinned package by
+// test/examples.test.mjs. A landing page that states a result states the
+// generator's, or the test fails.
+
+const EXAMPLE_TREE = `import { Jostraca, Project, Folder, File, Content } from 'jostraca'
+
+const model = { app: { name: 'acme' } }
+const jostraca = Jostraca({ model })
+
+await jostraca.generate({ folder: './out' }, () => {
+  Project({ folder: model.app.name }, () => {
+    File({ name: 'package.json' }, () => {
+      Content('{ "name": "$$app.name$$" }\\n')
+    })
+    Folder({ name: 'src' }, () => {
+      File({ name: 'index.js' }, () => {
+        Content('console.log("$$app.name$$")\\n')
+      })
+    })
+  })
+})`;
+
+const RESULT_TREE = `out/acme/package.json
+  { "name": "acme" }
+out/acme/src/index.js
+  console.log("acme")`;
+
+const EXAMPLE_PRESERVE = `import { appendFileSync } from 'node:fs'
+import { Jostraca, Project, File, Content } from 'jostraca'
+
+const jostraca = Jostraca({
+  existing: { txt: { write: true, preserve: true } },
+})
+
+const run = (text) => jostraca.generate({ folder: './out' }, () => {
+  Project({}, () => {
+    File({ name: 'notes.txt' }, () => Content(text))
+  })
+})
+
+await run('first generate\\n')
+appendFileSync('./out/notes.txt', 'a line somebody added\\n')
+await run('second generate\\n')`;
+
+const RESULT_PRESERVE = `out/notes.old.txt
+  first generate
+  a line somebody added
+out/notes.txt
+  second generate`;
+---
+
+<Base>
+  <section class="hero">
+    <h1>Generate code you can generate <em>again</em></h1>
+    <p class="lede">
+      Most generators are run once. The second run is the one that hurts:
+      somebody has edited the output by now, and overwriting it throws their
+      work away. Jostraca knows the whole tree it intends to write before it
+      writes a byte of it, so the second run has choices — overwrite, keep the
+      old bytes, put the new version beside them, hand back a diff, or merge.
+    </p>
+
+    <div class="cta">
+      <a class="button" href="/docs/tutorial">Start the tutorial</a>
+      <a class="button ghost" href="/how-to">How-to guides</a>
+      <a class="button ghost" href="/docs">Read the docs</a>
+    </div>
+  </section>
+
+  <section class="taste">
+    <div>
+      <h2>Declare the tree; Jostraca writes it</h2>
+      <p>
+        Components nest the way folders do. <code>Project</code> holds
+        <code>Folder</code> holds <code>File</code> holds
+        <code>Content</code>, and because they are ordinary function calls you
+        get loops, conditionals and parameters for free. No template dialect to
+        learn, and no dialect to outgrow.
+      </p>
+      <p>
+        <code>$$app.name$$</code> reaches into the model you passed to
+        <code>Jostraca()</code> and substitutes the value. That happens inside
+        file content. Names are plain JavaScript, as the folder above shows,
+        because a component call is a function call and you already have a
+        language for that.
+      </p>
+    </div>
+
+    <div class="panes">
+      <figure>
+        <figcaption>gen.mjs</figcaption>
+        <pre><code>{EXAMPLE_TREE}</code></pre>
+      </figure>
+      <figure>
+        <figcaption>what it wrote</figcaption>
+        <pre><code>{RESULT_TREE}</code></pre>
+      </figure>
+    </div>
+  </section>
+
+  <section class="second-run">
+    <h2>The second run</h2>
+    <p>
+      A generator that only ever runs on an empty directory is a project
+      template. Jostraca is built for the other case: the output is checked in,
+      somebody has edited it, and you need to regenerate anyway. Five modes
+      decide what happens to a file that already exists. Binaries get the first
+      three, because a diff of a PNG helps nobody, and the file's extension is
+      what picks the set.
+    </p>
+    <dl>
+      {MODES.map((mode) => (
+        <div class="mode">
+          <dt><code>{mode.name}</code></dt>
+          <dd>{mode.blurb}</dd>
+        </div>
+      ))}
+    </dl>
+
+    <div class="panes">
+      <figure>
+        <figcaption>two runs, with an edit in between</figcaption>
+        <pre><code>{EXAMPLE_PRESERVE}</code></pre>
+      </figure>
+      <figure>
+        <figcaption>what it wrote</figcaption>
+        <pre><code>{RESULT_PRESERVE}</code></pre>
+      </figure>
+    </div>
+
+    <p class="more">
+      A file carrying the string <code>JOSTRACA_PROTECT</code> is never
+      overwritten, whatever the mode says, so a reader can take a generated
+      file away from the generator without asking you first. The
+      <a href="/docs/reference-options">options reference</a> specifies each
+      mode; <a href="/how-to">the how-to guides</a> show them in use.
+    </p>
+  </section>
+
+  <section class="components">
+    <h2>{COMPONENTS.length} components</h2>
+    <p>
+      That is the whole vocabulary. Anything else you need is a function you
+      write yourself and wrap with <code>cmp()</code>, which makes it a
+      component like the rest.
+    </p>
+    <dl>
+      {COMPONENTS.map((component) => (
+        <div class="component">
+          <dt><code>{component.name}</code></dt>
+          <dd>{component.blurb}</dd>
+        </div>
+      ))}
+    </dl>
+    <p class="more">
+      Every prop and every default is in the
+      <a href="/docs/reference-components">component reference</a>.
+    </p>
+  </section>
+
+  <section class="parity">
+    <h2>Two implementations, one output</h2>
+    <p>
+      TypeScript is canonical and Go is a maintained port. They are held to
+      byte-identical output for the same logical input by a shared,
+      language-neutral test corpus that both suites read, so a behaviour
+      documented here means the same thing in either language. Where the two
+      disagree, TypeScript wins and Go is the one that gets fixed.
+    </p>
+    <p class="more">
+      The Go surface, and the places Go idiom forced a different shape, are in
+      the <a href="/docs/reference-go">Go reference</a>.
+    </p>
+  </section>
+
+  <section class="install">
+    <h2>Install</h2>
+    <div class="panes">
+      <figure>
+        <figcaption>npm</figcaption>
+        <pre><code>npm install jostraca@{JOSTRACA_VERSION}</code></pre>
+      </figure>
+      <figure>
+        <figcaption>Go</figcaption>
+        <pre><code>go get {GO_MODULE}</code></pre>
+      </figure>
+    </div>
+    <p class="more">
+      MIT licensed. Source, issues and the design record are on
+      <a href={GITHUB_REPO} rel="noopener">GitHub</a>.
+    </p>
+  </section>
+</Base>
+
+<style>
+  section {
+    padding: 56px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  section:last-of-type {
+    border-bottom: none;
+  }
+
+  .hero h1 {
+    max-width: 22ch;
+  }
+  .lede {
+    font-size: 1.1rem;
+    color: var(--ink-muted);
+    max-width: var(--measure);
+  }
+
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  .taste,
+  .second-run,
+  .components,
+  .parity,
+  .install {
+    display: block;
+  }
+
+  .taste > div:first-child p,
+  .second-run > p,
+  .components > p,
+  .parity > p {
+    max-width: var(--measure);
+  }
+
+  /*
+    Source above, result below. Two columns looked tidier and clipped the
+    first line of every example behind a scrollbar at 1280px, which is a
+    poor first thing for a landing page to do with its code. The short
+    install pair keeps its columns below.
+  */
+  .panes {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .install .panes {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .panes figure {
+    margin: 0;
+    min-width: 0;
+  }
+  .panes figcaption {
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+    font-family: var(--font-mono);
+    margin-bottom: 6px;
+  }
+  .panes pre {
+    margin: 0;
+    height: 100%;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 4px 28px;
+    margin: 24px 0 0;
+  }
+  .mode,
+  .component {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  dt {
+    margin: 0;
+    flex: 0 0 auto;
+  }
+  dd {
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: 0.92rem;
+  }
+
+  .more {
+    margin-top: 20px;
+    max-width: var(--measure);
+    color: var(--ink-muted);
+  }
+
+  @media (max-width: 760px) {
+    .install .panes {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,259 @@
+---
+import Base from "../layouts/Base.astro";
+import { GITHUB_REPO } from "../consts";
+
+// /why — the argument for the project, in the project's own voice.
+// Authored here (no upstream counterpart), so every example below is a claim
+// this repository must prove: test/examples.test.mjs runs each EXAMPLE/RESULT
+// pair through the pinned package and compares what it wrote.
+
+const EXAMPLE_WRITE = `import { appendFileSync } from 'node:fs'
+import { Jostraca, Project, File, Content } from 'jostraca'
+
+const jostraca = Jostraca()
+
+const run = (body) => jostraca.generate({ folder: './out' }, () => {
+  Project({}, () => {
+    File({ name: 'config.sh' }, () => Content(body))
+  })
+})
+
+await run('PORT=8080\\nHOST=localhost\\n')
+appendFileSync('./out/config.sh', 'DEBUG=1\\n')
+await run('PORT=9090\\nHOST=localhost\\n')`;
+
+const RESULT_WRITE = `out/config.sh
+  PORT=9090
+  HOST=localhost`;
+
+const EXAMPLE_MERGE = `import { appendFileSync } from 'node:fs'
+import { Jostraca, Project, File, Content } from 'jostraca'
+
+const jostraca = Jostraca({
+  existing: { txt: { write: true, merge: true } },
+})
+
+const run = (body) => jostraca.generate({ folder: './out' }, () => {
+  Project({}, () => {
+    File({ name: 'config.sh' }, () => Content(body))
+  })
+})
+
+await run('PORT=8080\\nHOST=localhost\\n')
+appendFileSync('./out/config.sh', 'DEBUG=1\\n')
+await run('PORT=9090\\nHOST=localhost\\n')`;
+
+const RESULT_MERGE = `out/config.sh
+  PORT=9090
+  HOST=localhost
+  DEBUG=1`;
+
+const EXAMPLE_LOOP = `import { Jostraca, Project, File, Content, each } from 'jostraca'
+
+const routes = [
+  { name: 'health', method: 'get' },
+  { name: 'login', method: 'post' },
+]
+
+const jostraca = Jostraca()
+
+await jostraca.generate({ folder: './out' }, () => {
+  Project({ folder: 'api' }, () => {
+    each(routes, (route) => {
+      File({ name: route.name + '.js' }, () => {
+        Content("export const method = '" + route.method + "'\\n")
+      })
+    })
+  })
+})`;
+
+const RESULT_LOOP = `out/api/health.js
+  export const method = 'get'
+out/api/login.js
+  export const method = 'post'`;
+
+const title = "Why Jostraca";
+const description =
+  "Why a code generator should treat the file already on disk as an input: " +
+  "the case for two phases, components, and a merge base.";
+---
+
+<Base title={title} description={description}>
+  <article class="why">
+    <h1>{title}</h1>
+
+    <p class="lede">
+      Code generation has a cliff, and everybody who has shipped a generator
+      has walked off it. The first run is a delight. The second run is where
+      you discover that somebody fixed a bug in the generated code by hand, and
+      your generator has just deleted the fix.
+    </p>
+
+    <h2 id="second-run">The second-run problem</h2>
+
+    <p>
+      Here is the cliff. A generator writes a config file, someone adds a line
+      to it, and the generator runs again:
+    </p>
+
+    <pre><code>{EXAMPLE_WRITE}</code></pre>
+    <p class="arrow">leaves</p>
+    <pre><code>{RESULT_WRITE}</code></pre>
+
+    <p>
+      <code>PORT</code> moved, which is what the second run was for.
+      <code>DEBUG=1</code> is gone, which nobody asked for. There was no
+      warning, no backup and no exit code to notice, because as far as the
+      generator was concerned it did exactly what it was told.
+    </p>
+
+    <p>
+      The usual answers are all avoidance. Generate into a directory nobody may
+      touch and re-export by hand. Generate once, check the output in, and
+      never run the generator again. Split every file into a generated half and
+      an editable half, and accept the ceremony. Each of these works, and each
+      is a way of not solving the problem.
+    </p>
+
+    <h2 id="two-phases">Two phases, so the tree is known first</h2>
+
+    <p>
+      A <code>generate()</code> call runs in two halves. The
+      <strong>define phase</strong> executes your callback: every component
+      call records a node in an in-memory tree, and nothing touches disk. The
+      <strong>build phase</strong> then walks that tree and performs the file
+      operations.
+    </p>
+
+    <p>
+      The split is what makes the rest possible. Because the whole intended
+      output is known before the first byte is written, Jostraca can compare
+      what it is about to write against what is already there, and against what
+      it wrote last time. Turn on <code>merge</code> and the same script,
+      unchanged but for one option, keeps the edit:
+    </p>
+
+    <pre><code>{EXAMPLE_MERGE}</code></pre>
+    <p class="arrow">leaves</p>
+    <pre><code>{RESULT_MERGE}</code></pre>
+
+    <p>
+      That is a three-way merge, and the base is the previous generate, which
+      Jostraca keeps under <code>.jostraca/</code> beside the output. Anything
+      in the file that is not in the base is somebody's edit; anything the
+      generator changed since the base is the generator's. The two are combined
+      the way a version control merge combines them, conflict markers and all
+      when they cannot both hold.
+    </p>
+
+    <p>
+      <code>merge</code> is one of five modes, and the modest ones earn their
+      keep more often: <code>preserve</code> writes the new version and leaves
+      the old bytes in a sibling file, <code>present</code> leaves the file
+      alone and writes the new version beside it, <code>diff</code> hands back
+      an annotated two-way diff. The modes are checked in that order, so
+      <code>present</code> needs <code>write: false</code> to take effect at
+      all. A file carrying <code>JOSTRACA_PROTECT</code> is never overwritten
+      under any of them — that is how a user takes a file away from the
+      generator without negotiating with you.
+    </p>
+
+    <h2 id="components">Components, because you already have a language</h2>
+
+    <p>
+      The other half of the design is what a generator is written in. Template
+      dialects start small and grow: first an interpolation, then a
+      conditional, then a loop, then partials, then a way to call out to real
+      code because the dialect cannot express the thing you need. Every step is
+      reasonable and the destination is a second language with worse tooling
+      than the one you were using.
+    </p>
+
+    <p>
+      Jostraca's components are function calls. Nesting them mirrors the
+      folders and files you want, and everything else — iteration, branching,
+      parameters, extraction into a helper — is whatever your language already
+      does:
+    </p>
+
+    <pre><code>{EXAMPLE_LOOP}</code></pre>
+    <p class="arrow">leaves</p>
+    <pre><code>{RESULT_LOOP}</code></pre>
+
+    <p>
+      There is a template syntax, and it is deliberately small:
+      <code>$$path$$</code> substitutes a value from the model, and that is
+      all it does. No conditionals, no loops, no expressions. Anything harder
+      belongs in the code around it, where you can test it.
+    </p>
+
+    <h2 id="cost">What it costs</h2>
+
+    <p>
+      A generator written this way is a program, so you have to write and run a
+      program to see its output. A template file you can open and read has a
+      real advantage over a tree of function calls, and Jostraca gives some of
+      it back with <code>Fragment</code> and <code>Slot</code> — an external
+      template file with named regions you fill — but a component tree is still
+      code, and code is heavier to skim.
+    </p>
+
+    <p>
+      The bookkeeping is on disk. A <code>.jostraca/</code> directory beside
+      the output holds the previous generate and a log of what happened, which
+      is what <code>merge</code> and unchanged-detection read. It is gitignored
+      by default, and if you delete it, merges fall back to having no base.
+    </p>
+
+    <p>
+      And two implementations means two chances to be wrong. Jostraca answers
+      that with a shared, language-neutral test corpus both stacks assert
+      against, and a rule for the arguments: TypeScript is canonical, so when
+      the two disagree, Go is the one that changes — even on the occasions when
+      the Go code happened to be more correct.
+    </p>
+
+    <h2 id="fit">When not to use it</h2>
+
+    <p>
+      If you scaffold a project once and never generate into it again, a
+      template repository is simpler and you should use one. If your output is
+      a single file with no structure, a string and
+      <code>writeFileSync</code> will do. Jostraca starts paying for itself
+      when the output is a tree, the tree is checked in, and the generator is
+      going to run again next month.
+    </p>
+
+    <p class="next">
+      Next: the <a href="/docs/tutorial">tutorial</a> builds a generator from
+      nothing, the <a href="/docs/explanation">explanation</a> argues the
+      design in full, and the <a href={GITHUB_REPO} rel="noopener">source</a>
+      holds both implementations and the corpus that keeps them honest.
+    </p>
+  </article>
+</Base>
+
+<style>
+  .why {
+    max-width: var(--measure);
+    padding: 40px 0 64px;
+  }
+  .lede {
+    font-size: 1.1rem;
+    color: var(--ink-muted);
+  }
+  h2 {
+    margin-top: 44px;
+  }
+  .arrow {
+    margin: 10px 0;
+    color: var(--ink-faint);
+    font-size: 0.88rem;
+  }
+  .next {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    color: var(--ink-muted);
+  }
+</style>

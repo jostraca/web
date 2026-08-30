@@ -1,0 +1,150 @@
+---
+import Base from "./Base.astro";
+import { getCollection } from "astro:content";
+import { GITHUB_REPO } from "../consts";
+
+interface Props {
+  title: string;
+  description: string;
+  source: string;
+}
+
+const { title, description, source } = Astro.props;
+
+// The sidebar is the collection itself, grouped by section — the same four
+// names, in the same order, that src/content.config.ts admits. Order within
+// a section comes from the sync manifest, so a page cannot appear here
+// without being synced.
+const SECTIONS = ["Start", "Tutorial", "Reference", "Understanding"] as const;
+const all = await getCollection("docs");
+const sorted = all.sort((a, b) => a.data.order - b.data.order);
+const groups = SECTIONS.map((name) => ({
+  name,
+  pages: sorted
+    .filter((p) => p.data.section === name)
+    .map((p) => ({
+      href: p.id === "index" ? "/docs" : `/docs/${p.id}`,
+      title: p.data.title,
+    })),
+})).filter((g) => g.pages.length > 0);
+
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+---
+
+<Base title={title} description={description}>
+  <div class="docs">
+    <nav class="side" aria-label="Documentation">
+      {groups.map((group) => (
+        <div class="group">
+          <p class="group-name">{group.name}</p>
+          <ul>
+            {group.pages.map((page) => (
+              <li>
+                <a href={page.href} aria-current={path === page.href ? "page" : undefined}>
+                  {page.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+          {group.name === "Tutorial" && (
+            <ul>
+              <li>
+                <a href="/how-to">How-to guides &rarr;</a>
+              </li>
+            </ul>
+          )}
+        </div>
+      ))}
+    </nav>
+
+    <article>
+      <h1>{title}</h1>
+      <p class="source">
+        Rendered from
+        <a href={`${GITHUB_REPO}/blob/master/${source}`} rel="noopener"><code>{source}</code></a>
+        in the generator repository — where a correction belongs, and where the
+        test suite runs every example on this page or states why it does not.
+      </p>
+      <slot />
+    </article>
+  </div>
+</Base>
+
+<style>
+  .docs {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding-top: 32px;
+  }
+  @media (min-width: 900px) {
+    .docs {
+      grid-template-columns: 216px minmax(0, 1fr);
+      gap: 48px;
+    }
+    .side {
+      position: sticky;
+      top: 24px;
+      align-self: start;
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+    }
+  }
+
+  .group + .group {
+    margin-top: 20px;
+  }
+  .group-name {
+    font-size: 0.74rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 6px;
+  }
+  .side ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: none;
+  }
+  .side li + li {
+    margin-top: 2px;
+  }
+  .side a {
+    display: block;
+    padding: 4px 0;
+    font-size: 0.93rem;
+    text-decoration: none;
+    color: var(--ink-muted);
+    line-height: 1.35;
+  }
+  .side a:hover {
+    color: var(--primary);
+  }
+  .side a[aria-current="page"] {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  article {
+    min-width: 0;
+  }
+  article :global(h2) {
+    margin-top: 2.2rem;
+  }
+  article :global(h3) {
+    margin-top: 1.6rem;
+  }
+  article :global(table) {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .source {
+    font-size: 0.87rem;
+    color: var(--ink-muted);
+    border-left: 2px solid var(--rule-strong);
+    padding-left: 14px;
+    margin: 14px 0 28px;
+  }
+</style>

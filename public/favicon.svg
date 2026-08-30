@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- A tree declared, then written: one root, two branches, three files.
+       Placeholder until the identity lands. -->
+  <rect width="32" height="32" rx="6" fill="#5a3fa8"/>
+  <g fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round">
+    <path d="M9 7v14h5M9 14h5"/>
+    <path d="M17 10h6M17 16h6M17 22h6"/>
+  </g>
+</svg>

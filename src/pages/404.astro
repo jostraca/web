@@ -1,0 +1,54 @@
+---
+import Base from "../layouts/Base.astro";
+// The same list the Worker offers a machine caller, imported rather than
+// retyped: the HTML and markdown answers to a 404 must offer the same
+// recovery routes, or one of them is wrong.
+import { ENTRY_POINTS } from "../worker";
+---
+
+<Base title="Not found" description="That page does not exist on jostraca.dev.">
+  <div class="wrap">
+    <p class="code">404</p>
+    <h1>That page does not exist</h1>
+    <p>Nothing is published at this address. Here is where to look instead.</p>
+
+    <ul>
+      {ENTRY_POINTS.map(([href, what]) => (
+        <li>
+          <a href={href}><code>{href}</code></a> — {what}
+        </li>
+      ))}
+    </ul>
+
+    <p class="note">
+      Every page here is also available as markdown: append <code>.md</code> to
+      the path, or send <code>Accept: text/markdown</code>.
+    </p>
+  </div>
+</Base>
+
+<style>
+  .wrap {
+    padding: 72px 0 96px;
+  }
+  .code {
+    font-family: var(--font-mono);
+    color: var(--ink-faint);
+    margin: 0 0 8px;
+    letter-spacing: 0.1em;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 24px 0;
+    display: grid;
+    gap: 10px;
+  }
+  li {
+    color: var(--ink-muted);
+  }
+  .note {
+    color: var(--ink-muted);
+    font-size: 0.94rem;
+  }
+</style>
