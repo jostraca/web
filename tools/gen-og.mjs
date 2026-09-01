@@ -9,9 +9,9 @@
 // the result.
 //
 // Everything it draws comes from the same places the site does: the strings
-// from src/consts.ts, the mark from public/favicon.svg, the colours from
-// src/styles/tokens.css. Nothing is restated here, so the card cannot end up
-// showing a tagline the site stopped using.
+// from src/consts.ts, the original ostracon from public/brand, and the colours
+// from src/styles/tokens.css. Nothing is restated here, so the card cannot end
+// up showing a tagline or identity the site stopped using.
 
 import { readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
@@ -42,34 +42,38 @@ function token(name) {
 const title = konst("SITE_TITLE");
 const tagline = konst("SITE_TAGLINE");
 const host = konst("SITE_HOST");
-const accent = token("--accent-700");
-const ground = token("--grey-50");
-const ink = token("--grey-900");
-const inkMuted = token("--grey-700");
+const accent = token("--clay-800");
+const ground = token("--earth-50");
+const ink = token("--earth-900");
+const inkMuted = token("--earth-700");
+const mat = token("--earth-100");
+const matRule = token("--earth-300");
+const soft = token("--clay-100");
+const shadowInk = token("--earth-950");
 
-// The favicon, inlined and resized. It is the mark; a second copy would drift.
-const mark = readFileSync(join(ROOT, "public/favicon.svg"), "utf8")
-  .replace(/<\?xml[^>]*\?>/, "")
-  .replace("<svg", '<svg class="mark"')
-  .trim();
+const ostracon = readFileSync(join(ROOT, "public/brand/ostracon.jpg")).toString("base64");
 
 const page = `<!doctype html><meta charset="utf-8"><style>
   *{box-sizing:border-box}
   body{margin:0;width:1200px;height:630px;background:${ground};
        font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-       display:flex;flex-direction:column;justify-content:center;
+       display:grid;grid-template-columns:1fr 260px;gap:80px;align-items:center;
        padding:0 86px;position:relative}
   .bar{position:absolute;top:0;left:0;right:0;height:14px;background:${accent}}
-  .mark{width:96px;height:96px;margin-bottom:34px}
+  .copy{min-width:0}
   h1{font-size:76px;line-height:1.02;margin:0 0 22px;color:${ink};letter-spacing:-.022em}
   p{font-size:35px;line-height:1.32;margin:0;color:${inkMuted};max-width:20ch;font-weight:400}
+  .mat{padding:38px;background:${mat};border:2px solid ${matRule};
+       box-shadow:14px 16px 0 ${soft},0 20px 45px color-mix(in srgb,${shadowInk} 20%,transparent);
+       transform:rotate(1.5deg)}
+  .ostracon{display:block;width:148px;height:200px;object-fit:cover;margin:auto;
+            box-shadow:0 8px 20px color-mix(in srgb,${shadowInk} 28%,transparent)}
   .host{position:absolute;bottom:52px;left:86px;font-size:25px;color:${accent};
         font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 </style>
 <div class="bar"></div>
-${mark}
-<h1>${title}</h1>
-<p>${tagline}.</p>
+<div class="copy"><h1>${title}</h1><p>${tagline}.</p></div>
+<div class="mat"><img class="ostracon" src="data:image/jpeg;base64,${ostracon}"></div>
 <div class="host">${host}</div>`;
 
 // playwright-core is a devDependency and brings no browser of its own, so it

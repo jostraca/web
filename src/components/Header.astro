@@ -16,7 +16,11 @@ const isCurrent = (href: string) => path === href;
   <a class="skip-link" href="#main">Skip to content</a>
   <div class="bar">
     <a class="brand" href="/">
-      <strong>{SITE_TITLE}</strong>
+      <img src="/brand/ostracon.jpg" width="30" height="41" alt="" />
+      <span>
+        <strong>{SITE_TITLE}</strong>
+        <small>code generation, made repeatable</small>
+      </span>
     </a>
 
     <nav aria-label="Primary">
@@ -38,17 +42,19 @@ const isCurrent = (href: string) => path === href;
 
 <style>
   header {
-    border-bottom: 1px solid var(--rule);
+    border-top: 4px solid var(--primary);
+    border-bottom: 1px solid var(--rule-strong);
     background: var(--bg-raised);
+    box-shadow: 0 3px 16px var(--shadow);
   }
 
   .bar {
     max-width: var(--page);
     margin: 0 auto;
-    padding: 14px 24px;
+    padding: 10px 24px;
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
+    align-items: center;
     gap: 12px 28px;
   }
 
@@ -56,12 +62,28 @@ const isCurrent = (href: string) => path === href;
     text-decoration: none;
     color: var(--ink);
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 10px;
   }
   .brand strong {
-    font-size: 1.15rem;
-    letter-spacing: -0.02em;
+    display: block;
+    font-family: var(--font-head);
+    font-size: 1.28rem;
+    line-height: 1;
+    letter-spacing: -0.035em;
+  }
+  .brand img {
+    border: 1px solid var(--rule-strong);
+    box-shadow: 1px 2px 5px var(--shadow);
+  }
+  .brand small {
+    display: block;
+    margin-top: 3px;
+    color: var(--ink-faint);
+    font-size: 0.65rem;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
   nav {
     margin-left: auto;
@@ -84,8 +106,10 @@ const isCurrent = (href: string) => path === href;
     color: var(--primary);
   }
   nav a[aria-current="page"] {
-    color: var(--ink);
+    color: var(--primary);
     font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 6px;
   }
 
   @media (max-width: 640px) {

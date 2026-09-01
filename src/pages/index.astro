@@ -61,20 +61,36 @@ out/notes.txt
 
 <Base home>
   <section class="hero">
-    <h1>Generate code you can generate <em>again</em></h1>
-    <p class="lede">
-      Most generators are run once. The second run is the one that hurts:
-      somebody has edited the output by now, and overwriting it throws their
-      work away. Jostraca knows the whole tree it intends to write before it
-      writes a byte of it, so the second run has choices — overwrite, keep the
-      old bytes, put the new version beside them, hand back a diff, or merge.
-    </p>
+    <div class="hero-copy">
+      <p class="eyebrow">A generator that remembers the human</p>
+      <h1>Generate code you can generate <em>again</em></h1>
+      <p class="lede">
+        Most generators are run once. The second run is the one that hurts:
+        somebody has edited the output by now, and overwriting it throws their
+        work away. Jostraca knows the whole tree it intends to write before it
+        writes a byte of it, so the second run has choices — overwrite, keep the
+        old bytes, put the new version beside them, hand back a diff, or merge.
+      </p>
 
-    <div class="cta">
-      <a class="button" href="/docs/tutorial">Start the tutorial</a>
-      <a class="button ghost" href="/how-to">How-to guides</a>
-      <a class="button ghost" href="/docs">Read the docs</a>
+      <div class="cta">
+        <a class="button" href="/docs/tutorial">Start the tutorial</a>
+        <a class="button ghost" href="/how-to">How-to guides</a>
+        <a class="button ghost" href="/docs">Read the docs</a>
+      </div>
     </div>
+    <figure class="ostracon">
+      <div class="image-mat">
+        <img
+          src="/brand/ostracon.jpg"
+          width="74"
+          height="100"
+          alt="An ancient ostracon bearing a sketched profile and the word Jostraca"
+        />
+      </div>
+      <figcaption>
+        A fragment carrying a message forward. The original Jostraca mark.
+      </figcaption>
+    </figure>
   </section>
 
   <section class="taste">
@@ -207,17 +223,73 @@ out/notes.txt
     padding: 56px 0;
     border-bottom: 1px solid var(--rule);
   }
+
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 240px;
+    gap: clamp(40px, 8vw, 96px);
+    align-items: center;
+    padding: clamp(64px, 10vw, 112px) 0;
+  }
+  .hero-copy {
+    min-width: 0;
+  }
   section:last-of-type {
     border-bottom: none;
   }
 
   .hero h1 {
-    max-width: 22ch;
+    max-width: 18ch;
+    font-size: clamp(3rem, 7.5vw, 5.6rem);
+    line-height: 0.96;
+  }
+  .hero h1 em {
+    color: var(--primary);
+    font-weight: inherit;
+  }
+  .eyebrow {
+    margin: 0 0 18px;
+    color: var(--primary);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
   .lede {
-    font-size: 1.1rem;
+    margin-top: 26px;
+    font-size: 1.12rem;
     color: var(--ink-muted);
     max-width: var(--measure);
+  }
+
+  .ostracon {
+    margin: 0;
+  }
+  .image-mat {
+    display: grid;
+    place-items: center;
+    min-height: 320px;
+    padding: 38px;
+    background: var(--bg-sunken);
+    border: 1px solid var(--rule-strong);
+    box-shadow: 8px 10px 0 var(--primary-soft), 0 18px 38px var(--shadow);
+    transform: rotate(1.4deg);
+  }
+  .image-mat img {
+    width: 148px;
+    height: 200px;
+    object-fit: cover;
+    box-shadow: 0 8px 20px var(--shadow);
+  }
+  .ostracon figcaption {
+    margin-top: 20px;
+    color: var(--ink-faint);
+    font-family: var(--font-head);
+    font-size: 0.82rem;
+    font-style: italic;
+    line-height: 1.4;
+    text-align: center;
   }
 
   .cta {
@@ -304,6 +376,19 @@ out/notes.txt
   }
 
   @media (max-width: 760px) {
+    .hero {
+      grid-template-columns: 1fr;
+      gap: 44px;
+      padding: 56px 0 64px;
+    }
+    .hero h1 {
+      font-size: clamp(2.8rem, 14vw, 4.4rem);
+    }
+    .ostracon {
+      max-width: 240px;
+      margin-left: auto;
+      margin-right: auto;
+    }
     .install .panes {
       grid-template-columns: 1fr;
     }

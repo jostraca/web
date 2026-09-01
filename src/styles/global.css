@@ -34,6 +34,9 @@ body {
   /* The Worker composites this page over a ground it paints itself, so the
      background is explicit rather than inherited. */
   background: var(--bg);
+  background-image:
+    radial-gradient(circle at 12% 0%, var(--wash), transparent 34rem),
+    linear-gradient(90deg, transparent 0, var(--wash) 50%, transparent 100%);
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 17px;
@@ -93,17 +96,17 @@ h3,
 h4 {
   font-family: var(--font-head);
   line-height: 1.2;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.025em;
   text-wrap: balance;
   margin: 0;
 }
 
 h1 {
-  font-size: clamp(2rem, 4.5vw, 2.7rem);
-  font-weight: 650;
+  font-size: clamp(2.2rem, 5vw, 3.15rem);
+  font-weight: 600;
 }
 h2 {
-  font-size: clamp(1.4rem, 3vw, 1.75rem);
+  font-size: clamp(1.5rem, 3vw, 1.95rem);
   font-weight: 600;
 }
 h3 {
@@ -210,6 +213,7 @@ pre {
   overflow-x: auto;
   max-width: none;
   line-height: 1.55;
+  box-shadow: inset 0 1px 0 var(--bg-raised);
 }
 
 pre code {
