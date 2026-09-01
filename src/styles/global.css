@@ -33,7 +33,22 @@ body {
   margin: 0;
   /* The Worker composites this page over a ground it paints itself, so the
      background is explicit rather than inherited. */
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image:
+    repeating-linear-gradient(
+      2deg,
+      transparent 0,
+      transparent 46px,
+      color-mix(in srgb, var(--clay-700) 2.5%, transparent) 47px,
+      transparent 48px
+    ),
+    repeating-linear-gradient(
+      91deg,
+      transparent 0,
+      transparent 83px,
+      color-mix(in srgb, var(--earth-700) 2%, transparent) 84px,
+      transparent 85px
+    );
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 17px;
@@ -42,6 +57,16 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+
+:root[data-theme="dark"] body {
+  background-image: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body {
+    background-image: none;
+  }
 }
 
 /*

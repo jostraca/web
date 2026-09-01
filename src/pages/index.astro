@@ -61,6 +61,19 @@ out/notes.txt
 
 <Base home>
   <section class="hero">
+    <figure class="ostracon">
+      <img
+        src="/brand/senenmut-ostracon.jpg"
+        width="1350"
+        height="1800"
+        alt="An ancient limestone ostracon bearing a red grid and a profile sketch of Senenmut"
+      />
+      <figcaption>
+        <a href="https://www.metmuseum.org/art/collection/search/547684" rel="noopener">
+          Artist’s Gridded Sketch of Senenmut
+        </a>, New Kingdom. The Metropolitan Museum of Art, public domain.
+      </figcaption>
+    </figure>
     <div class="hero-copy">
       <p class="eyebrow">A generator that remembers the human</p>
       <h1>Generate code you can generate <em>again</em></h1>
@@ -78,19 +91,6 @@ out/notes.txt
         <a class="button ghost" href="/docs">Read the docs</a>
       </div>
     </div>
-    <figure class="ostracon">
-      <div class="image-mat">
-        <img
-          src="/brand/ostracon-restored.png"
-          width="1104"
-          height="1424"
-          alt="An ancient ostracon bearing a sketched profile and the word Jostraca"
-        />
-      </div>
-      <figcaption>
-        A fragment carrying a message forward. The original Jostraca mark.
-      </figcaption>
-    </figure>
   </section>
 
   <section class="taste">
@@ -225,14 +225,11 @@ out/notes.txt
   }
 
   .hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 240px;
-    gap: clamp(40px, 8vw, 96px);
-    align-items: center;
+    text-align: center;
     padding: clamp(64px, 10vw, 112px) 0;
   }
   .hero-copy {
-    min-width: 0;
+    margin: 0 auto;
   }
   section:last-of-type {
     border-bottom: none;
@@ -240,6 +237,8 @@ out/notes.txt
 
   .hero h1 {
     max-width: 18ch;
+    margin-left: auto;
+    margin-right: auto;
     font-size: clamp(3rem, 7.5vw, 5.6rem);
     line-height: 0.96;
   }
@@ -261,28 +260,24 @@ out/notes.txt
     font-size: 1.12rem;
     color: var(--ink-muted);
     max-width: var(--measure);
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .ostracon {
-    margin: 0;
+    margin: 0 auto 28px;
   }
-  .image-mat {
-    display: grid;
-    place-items: center;
-    min-height: 320px;
-    padding: 38px;
-    background: var(--bg-sunken);
-    border: 1px solid var(--rule-strong);
-    box-shadow: 8px 10px 0 var(--secondary-soft), 0 18px 38px var(--shadow);
-    transform: rotate(1.4deg);
-  }
-  .image-mat img {
-    width: 170px;
+  .ostracon img {
+    display: block;
+    width: 128px;
     height: auto;
-    box-shadow: 0 8px 20px var(--shadow);
+    margin: 0 auto;
+    border: 1px solid var(--rule-strong);
+    box-shadow: 0 8px 24px var(--shadow);
   }
   .ostracon figcaption {
-    margin-top: 20px;
+    margin: 10px auto 0;
+    max-width: 42ch;
     color: var(--ink-faint);
     font-family: var(--font-head);
     font-size: 0.82rem;
@@ -296,6 +291,7 @@ out/notes.txt
     flex-wrap: wrap;
     gap: 12px;
     margin-top: 28px;
+    justify-content: center;
   }
 
   .taste,
@@ -376,17 +372,10 @@ out/notes.txt
 
   @media (max-width: 760px) {
     .hero {
-      grid-template-columns: 1fr;
-      gap: 44px;
       padding: 56px 0 64px;
     }
     .hero h1 {
       font-size: clamp(2.8rem, 14vw, 4.4rem);
-    }
-    .ostracon {
-      max-width: 240px;
-      margin-left: auto;
-      margin-right: auto;
     }
     .install .panes {
       grid-template-columns: 1fr;

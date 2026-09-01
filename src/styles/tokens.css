@@ -38,15 +38,16 @@
   --earth-50: #f7f0e5;
   --plaster: #fcf8f0;
 
-  --clay-900: #4a2418;
-  --clay-800: #632f1f;
-  --clay-700: #7b3d29;
-  --clay-600: #965238;
-  --clay-500: #ad684a;
-  --clay-400: #c68666;
-  --clay-300: #daa88c;
-  --clay-200: #eac9b5;
-  --clay-100: #f5e3d7;
+  /* Iron red sampled from the Senenmut ostracon's construction grid. */
+  --clay-900: #491f18;
+  --clay-800: #672d23;
+  --clay-700: #843b2e;
+  --clay-600: #9d4d3a;
+  --clay-500: #b3634c;
+  --clay-400: #c98069;
+  --clay-300: #daa28f;
+  --clay-200: #e9c4b7;
+  --clay-100: #f5e2dc;
 
   /* The original site's cobalt, weathered toward mineral ink. */
   --blue-900: #1f3150;
@@ -76,7 +77,7 @@
   --primary-soft: var(--blue-100);
   --on-primary: var(--plaster);
 
-  --secondary: var(--clay-800);
+  --secondary: var(--clay-700);
   --secondary-soft: var(--clay-100);
 
   --focus: var(--blue-600);
