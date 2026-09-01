@@ -1,0 +1,142 @@
+---
+import Prose from "../layouts/Prose.astro";
+
+const title = "The original Jostraca";
+const description =
+  "The history of the original Java Jostraca code generator, its releases, " +
+  "design, contributors, and relationship to the current project.";
+
+const ARCHIVE =
+  "https://web.archive.org/web/20130901123451/http://www.jostraca.org/";
+---
+
+<Prose
+  title={title}
+  description={description}
+  lede="Before the TypeScript and Go implementations, Jostraca was a Java toolkit for template-driven code generation. This is the project the name and ostracon came from."
+>
+  <figure class="legacy-mark">
+    <img
+      src="/brand/ostracon-restored.png"
+      width="1104"
+      height="1424"
+      alt="The original Jostraca ostracon: a drawn profile under the handwritten project name"
+    />
+    <figcaption>
+      The original project mark, restored from the surviving 74 × 100 pixel web image.
+    </figcaption>
+  </figure>
+
+  <h2 id="project">The Java project</h2>
+
+  <p>
+    The original Jostraca described itself as a general-purpose code generation
+    toolkit for software developers. It treated generation as “programming by
+    example”: give the computer a representative file and let a template produce
+    the repeated variations. The generator was written in Java and used Java
+    Server Pages syntax, but the files it produced did not have to be Java.
+  </p>
+
+  <p>
+    Its supplied configurations covered Java, JavaScript, Perl, Python, Jython,
+    Ruby, Rebol and C. A Java 1.2 interpreter and compiler, plus a text editor,
+    were the stated requirements. The project later gained an Ant task and an
+    Eclipse plugin called CodeGenClipse. Release 0.4.1 also added JavaScript
+    templates through Rhino.
+  </p>
+
+  <h2 id="timeline">Release timeline</h2>
+
+  <dl class="timeline">
+    <dt><time datetime="2000-08-21">21 August 2000</time></dt>
+    <dd>Jostraca 0.1.0a, the first release recorded by the old site.</dd>
+
+    <dt><time datetime="2002-01-14">14 January 2002</time></dt>
+    <dd>Jostraca 0.2.0a launched, followed by 0.2.1a two weeks later.</dd>
+
+    <dt><time datetime="2002-06-15">15 June 2002</time></dt>
+    <dd>The project appeared at ECOOP 2002.</dd>
+
+    <dt><time datetime="2002-08-04">4 August 2002</time></dt>
+    <dd>Jostraca 0.3.1 was released; 0.3.2 and 0.3.3 followed in 2003.</dd>
+
+    <dt><time datetime="2004-11-26">26 November 2004</time></dt>
+    <dd>Jostraca 0.4.0 was released.</dd>
+
+    <dt><time datetime="2006-05-31">31 May 2006</time></dt>
+    <dd>
+      Jostraca 0.4.1 became the final release listed on the site. Binary and
+      source distributions were published as ZIP and tar.gz archives.
+    </dd>
+  </dl>
+
+  <h2 id="licence">Freedom to generate</h2>
+
+  <p>
+    The Java generator was distributed under version 2 of the GNU General Public
+    License. Its site made a separate promise about output: code produced with
+    Jostraca belonged entirely to the person who generated it. The generator did
+    not impose an IDE, technology or layout on that output.
+  </p>
+
+  <h2 id="people">People</h2>
+
+  <p>
+    Richard Rodger maintained the project. The old credits name Morten
+    Christensen for the Eclipse plugin, Orla Shanaghy as documentation editor,
+    Derek Conniffe for hardware and server work, Lars Grammel for the Ant task,
+    Tim Buchalka for <code>build.xml</code>, and Chris Perdue for
+    <code>CommandRunner</code>. They also thank Eoin Shanaghy, Godfrey Nolan,
+    Gerry Feeney, Alaister Moull, Conor Wyse and Caroline Hughes as reviewers.
+  </p>
+
+  <h2 id="today">What carried forward</h2>
+
+  <p>
+    The current Jostraca is a new TypeScript and Go implementation, not the Java
+    0.4.x distribution. The runtime, component model and release line are new.
+    What carried forward is the purpose: remove repetitive work by generating
+    code from a model, while leaving the generated code useful and owned by the
+    developer. The name and the ostracon mark carry that history visibly into
+    the new project.
+  </p>
+
+  <p class="footnote">
+    Read the
+    <a href={ARCHIVE} rel="noopener">archived original site</a>, including its
+    manuals, examples, release notes and surviving downloads. It is historical
+    material; use the <a href="/docs">current documentation</a> for this project.
+  </p>
+</Prose>
+
+<style>
+  .legacy-mark {
+    float: right;
+    width: min(210px, 42%);
+    margin: 8px 0 28px 36px;
+  }
+  .legacy-mark img {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--rule-strong);
+    box-shadow: 7px 8px 0 var(--secondary-soft);
+  }
+  .legacy-mark figcaption {
+    margin-top: 14px;
+    color: var(--ink-faint);
+    font-family: var(--font-head);
+    font-size: 0.82rem;
+    font-style: italic;
+    line-height: 1.4;
+  }
+  .timeline dt {
+    color: var(--secondary);
+  }
+  @media (max-width: 560px) {
+    .legacy-mark {
+      float: none;
+      width: min(210px, 70%);
+      margin: 12px auto 40px;
+    }
+  }
+</style>

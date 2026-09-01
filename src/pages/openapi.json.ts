@@ -41,6 +41,7 @@ async function pageRoutes(): Promise<string[]> {
     "/",
     "/why",
     "/about",
+    "/legacy",
     "/contact",
     "/privacy",
     "/docs",
