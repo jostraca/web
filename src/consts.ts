@@ -1,4 +1,4 @@
-// Global site data — imported anywhere with `import { ... } from '../consts'`.
+// Global site data -  imported anywhere with `import { ... } from '../consts'`.
 
 export const SITE_TITLE = "Jostraca";
 export const SITE_TAGLINE = "A code generator you can run twice";
@@ -35,7 +35,7 @@ export const GO_MODULE = "github.com/jostraca/jostraca/go";
 export const GO_PKG_DOC = "https://pkg.go.dev/github.com/jostraca/jostraca/go";
 
 // The exact version of the `jostraca` package this site runs and documents
-// against. Read from package.json rather than restated — the pin is one
+// against. Read from package.json rather than restated -  the pin is one
 // fact and it lives in one place.
 export { version as JOSTRACA_VERSION } from "jostraca/package.json";
 

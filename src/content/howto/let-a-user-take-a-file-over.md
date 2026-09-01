@@ -10,7 +10,7 @@ source: "docs/how-to/let-a-user-take-a-file-over.md"
      edit docs/how-to/let-a-user-take-a-file-over.md upstream, then run `npm run sync-docs`. -->
 Put the string `JOSTRACA_PROTECT` anywhere in a generated file and no
 later run will overwrite it. It needs no comment syntax, no anchor and
-no surrounding structure — a substring is enough, so a comment in
+no surrounding structure - a substring is enough, so a comment in
 whatever language the file is written in works.
 
 <!-- test: scenario regen-protect -->
@@ -54,7 +54,7 @@ generator. Emit the marker yourself only in files you intend people to
 adopt.
 
 Under `write`, `preserve`, `diff` and `merge` a protected file is
-skipped outright and appears in none of the result arrays — not
+skipped outright and appears in none of the result arrays - not
 written, not preserved, not even reported as unchanged. `present` is
 the exception: the file is still not overwritten, but the `.new`
 sidecar is written and the path is reported as presented.

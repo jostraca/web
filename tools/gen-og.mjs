@@ -51,7 +51,7 @@ const matRule = token("--earth-300");
 const soft = token("--clay-100");
 const shadowInk = token("--earth-950");
 
-const ostracon = readFileSync(join(ROOT, "public/brand/senenmut-ostracon.jpg")).toString("base64");
+const ostracon = readFileSync(join(ROOT, "public/brand/jostraca-logo.png")).toString("base64");
 
 const page = `<!doctype html><meta charset="utf-8"><style>
   *{box-sizing:border-box}
@@ -73,7 +73,7 @@ const page = `<!doctype html><meta charset="utf-8"><style>
 </style>
 <div class="bar"></div>
 <div class="copy"><h1>${title}</h1><p>${tagline}.</p></div>
-<div class="mat"><img class="ostracon" src="data:image/jpeg;base64,${ostracon}"></div>
+<div class="mat"><img class="ostracon" src="data:image/png;base64,${ostracon}"></div>
 <div class="host">${host}</div>`;
 
 // playwright-core is a devDependency and brings no browser of its own, so it

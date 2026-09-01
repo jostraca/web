@@ -2,7 +2,7 @@
 import Base from "../layouts/Base.astro";
 import { GITHUB_REPO, MODES } from "../consts";
 
-// /why — the argument for the project, in the project's own voice.
+// /why -  the argument for the project, in the project's own voice.
 // Authored here (no upstream counterpart), so every example below is a claim
 // this repository must prove: test/examples.test.mjs runs each EXAMPLE/RESULT
 // pair through the pinned package and compares what it wrote.
@@ -150,11 +150,11 @@ const description =
       <code>merge</code> is one of {MODES.length} modes, and the modest ones
       earn their keep more often: <code>preserve</code> writes the new version and leaves
       the old bytes in a sibling file, <code>present</code> leaves the file
-      alone and writes the new version beside it, <code>diff</code> hands back
+      alone and writes the new version beside it, <code>diff</code> returns
       an annotated two-way diff. The modes are checked in that order, so
       <code>present</code> needs <code>write: false</code> to take effect at
       all. A file carrying <code>JOSTRACA_PROTECT</code> is never overwritten
-      under any of them — that is how a user takes a file away from the
+      under any of them. That is how a user takes a file away from the
       generator without negotiating with you.
     </p>
 
@@ -163,17 +163,16 @@ const description =
     <p>
       The other half of the design is what a generator is written in. Template
       dialects start small and grow: first an interpolation, then a
-      conditional, then a loop, then partials, then a way to call out to real
-      code because the dialect cannot express the thing you need. Every step is
+      conditional, then a loop, then partials, then a way to call JavaScript
+      because the dialect cannot express the thing you need. Every step is
       reasonable and the destination is a second language with worse tooling
       than the one you were using.
     </p>
 
     <p>
       Jostraca's components are function calls. Nesting them mirrors the
-      folders and files you want, and everything else — iteration, branching,
-      parameters, extraction into a helper — is whatever your language already
-      does:
+      folders and files you want. Iteration, branching, parameters, and helper
+      functions use the language you already know:
     </p>
 
     <pre><code>{EXAMPLE_LOOP}</code></pre>
@@ -192,9 +191,9 @@ const description =
     <p>
       A generator written this way is a program, so you have to write and run a
       program to see its output. A template file you can open and read has a
-      real advantage over a tree of function calls, and Jostraca gives some of
-      it back with <code>Fragment</code> and <code>Slot</code> — an external
-      template file with named regions you fill — but a component tree is still
+      practical advantage over a tree of function calls. Jostraca restores some
+      of it with <code>Fragment</code> and <code>Slot</code>: an external
+      template file with named regions you fill. A component tree is still
       code, and code is heavier to skim.
     </p>
 
@@ -209,7 +208,7 @@ const description =
       And two implementations means two chances to be wrong. Jostraca answers
       that with a shared, language-neutral test corpus both stacks assert
       against, and a rule for the arguments: TypeScript is canonical, so when
-      the two disagree, Go is the one that changes — even on the occasions when
+      the two disagree, Go is the one that changes, even on the occasions when
       the Go code happened to be more correct.
     </p>
 

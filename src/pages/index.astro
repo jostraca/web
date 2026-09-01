@@ -61,28 +61,22 @@ out/notes.txt
 
 <Base home>
   <section class="hero">
-    <figure class="ostracon">
+    <div class="ostracon" aria-hidden="true">
       <img
-        src="/brand/senenmut-ostracon.jpg"
-        width="1350"
-        height="1800"
-        alt="An ancient limestone ostracon bearing a red grid and a profile sketch of Senenmut"
+        src="/brand/jostraca-logo.png"
+        width="1024"
+        height="1536"
+        alt=""
       />
-      <figcaption>
-        <a href="https://www.metmuseum.org/art/collection/search/547684" rel="noopener">
-          Artist’s Gridded Sketch of Senenmut
-        </a>, New Kingdom. The Metropolitan Museum of Art, public domain.
-      </figcaption>
-    </figure>
+    </div>
     <div class="hero-copy">
-      <p class="eyebrow">A generator that remembers the human</p>
-      <h1>Generate code you can generate <em>again</em></h1>
+      <p class="eyebrow">Code generation after the first run</p>
+      <h1>Generate it now. Generate it <em>again</em>.</h1>
       <p class="lede">
-        Most generators are run once. The second run is the one that hurts:
-        somebody has edited the output by now, and overwriting it throws their
-        work away. Jostraca knows the whole tree it intends to write before it
-        writes a byte of it, so the second run has choices — overwrite, keep the
-        old bytes, put the new version beside them, hand back a diff, or merge.
+        Running a generator once is easy. Run it again after somebody edits the
+        output and you have a less cheerful problem. Jostraca calculates every
+        file before it writes one, so you can overwrite, preserve, present,
+        diff, or merge on the second run.
       </p>
 
       <div class="cta">
@@ -95,13 +89,13 @@ out/notes.txt
 
   <section class="taste">
     <div>
-      <h2>Declare the tree; Jostraca writes it</h2>
+      <h2>Declare a tree. Jostraca writes it.</h2>
       <p>
-        Components nest the way folders do. <code>Project</code> holds
-        <code>Folder</code> holds <code>File</code> holds
-        <code>Content</code>, and because they are ordinary function calls you
-        get loops, conditionals and parameters for free. No template dialect to
-        learn, and no dialect to outgrow.
+        Components nest like directories. <code>Project</code> contains
+        <code>Folder</code>, which contains <code>File</code>, which contains
+        <code>Content</code>. They are ordinary function calls, so loops,
+        conditionals, and parameters are ordinary JavaScript too. There is no
+        template language waiting to become your next programming language.
       </p>
       <p>
         <code>$$app.name$$</code> reaches into the model you passed to
@@ -194,7 +188,7 @@ out/notes.txt
       disagree, TypeScript wins and Go is the one that gets fixed.
     </p>
     <p class="more">
-      The Go surface, and the places Go idiom forced a different shape, are in
+      The Go API, including the places where Go idiom requires a different structure, is in
       the <a href="/docs/reference-go">Go reference</a>.
     </p>
   </section>
@@ -275,17 +269,6 @@ out/notes.txt
     border: 1px solid var(--rule-strong);
     box-shadow: 0 8px 24px var(--shadow);
   }
-  .ostracon figcaption {
-    margin: 10px auto 0;
-    max-width: 42ch;
-    color: var(--ink-faint);
-    font-family: var(--font-head);
-    font-size: 0.82rem;
-    font-style: italic;
-    line-height: 1.4;
-    text-align: center;
-  }
-
   .cta {
     display: flex;
     flex-wrap: wrap;

@@ -19,7 +19,7 @@ go get github.com/jostraca/jostraca/go
 ```
 
 TypeScript is the source of truth. When the two disagree, TypeScript
-wins and Go is the one that changes — see the
+wins and Go is the one that changes - see the
 [explanation](/docs/explanation#two-implementations) for why that rule and
 not a better-looking one.
 
@@ -92,7 +92,7 @@ more than one prop, a `…P` variant taking a props struct.
 | method | props struct | fields |
 |---|---|---|
 | `Project(ProjectProps, body)` | `ProjectProps` | `Name`, `Folder` |
-| `Folder(name, body)` | — | — |
+| `Folder(name, body)` | - | - |
 | `File(name, body)` / `FileP(FileProps, body)` | `FileProps` | `Name`, `Exclude any`, `Mode fs.FileMode` |
 | `Content(src)` / `ContentP(ContentProps)` | `ContentProps` | `Src`, `Name`, `Indent any`, `Replace map[string]any`, `Extra map[string]any` |
 | `Line(src)` / `LineP(ContentProps)` | as `Content` | |
@@ -101,7 +101,7 @@ more than one prop, a `…P` variant taking a props struct.
 | `Inject(name, body)` / `InjectP(InjectProps, body)` | `InjectProps` | `Name`, `Markers`, `Exclude` |
 | `Copy(CopyProps)` | `CopyProps` | `From`, `To`, `Exclude`, `Replace` |
 | `List(items, body)` / `ListP(ListProps, body)` | `ListProps` | `Item`, `Indent`, `NoLine`, `Replace` |
-| `Cmp(name, fn)` | — | a user component |
+| `Cmp(name, fn)` | - | a user component |
 
 `List`'s body signature is `func(j *J, item any)`, so the item arrives
 as a parameter rather than through a props object.
@@ -129,7 +129,7 @@ for configuration that arrives as data.
 **`Options.Mem` and `Options.Vol` are inert in the Go port.** Nothing
 constructs an in-memory filesystem from them. A generator configured
 with `WithMem()` runs against the **real filesystem**, writes real
-files, and returns a result whose `Vol` and `FS` are both `nil` — with
+files, and returns a result whose `Vol` and `FS` are both `nil` - with
 no error:
 
 <!-- test: skip a Go sample; the behaviour is stated from a compiled probe and is a deviation, not an API to copy -->
@@ -171,8 +171,8 @@ no `WithCmp`. Verified with a `Copy` and an ignore pattern:
 
 | where the ignore list was set | what was copied |
 |---|---|
-| `Generate(Options{Cmp: …})` | `keep.txt` **and** `skip.log` — ignored |
-| a global option on `New` | `keep.txt` only — honoured |
+| `Generate(Options{Cmp: …})` | `keep.txt` **and** `skip.log` - ignored |
+| a global option on `New` | `keep.txt` only - honoured |
 
 So the only route to `Options.Cmp.Copy.Ignore` today is a hand-written
 option closure passed to `New`:
@@ -288,7 +288,7 @@ is no sort-by-property in Go.
   skips `undefined`, while a `nil` map value or slice element
   overwrites, as TypeScript's `null` does. Only `[]any` merges by index;
   a typed slice such as `[]string` takes the right-wins path, as does
-  any value carrying a type of its own — which is TypeScript's
+  any value carrying a type of its own - which is TypeScript's
   custom-constructor rule.
 - **`WithMem` and `WithVol` are inert**, and the option merge drops
   per-call `Cmp` and `Name`. Both are described above, with what to do
@@ -299,7 +299,7 @@ is no sort-by-property in Go.
   non-`Slot` child in TypeScript and invisible in Go, and the
   "non-`Slot` child with no unnamed marker" error fires in TypeScript
   only. A component that *wraps* a `Slot` is broken in TypeScript today
-  — the slot name is never collected and the marker survives verbatim —
+ - the slot name is never collected and the marker survives verbatim -
   and Go handles it. Reconciling means giving `Cmp` a node, which
   changes the shape of every Go component tree, so it stands.
 - `PointUtil` is not ported.
@@ -317,7 +317,7 @@ two copies of the package interoperate.
 
 ## Parity, and where it is pinned
 
-Behaviour shared by both stacks lives in
+Behaviour shared by both stacks is specified in
 [`../test/spec/`](https://github.com/jostraca/jostraca/tree/master/test/spec/): language-neutral TSV cases that
 `ts/test/spec.test.ts` and `go/spec_test.go` both read. An unknown case
 is a hard failure on both sides, so a row cannot be silently skipped by
@@ -325,7 +325,7 @@ one.
 
 Beyond that, `go/testdata/parity/` holds whole-scenario fixtures
 generated from canonical TypeScript, and CI regenerates them and fails
-on any diff — so a TypeScript change cannot leave the Go expectations
+on any diff - so a TypeScript change cannot leave the Go expectations
 stale.
 
 Design background is in [`go/PORT_PLAN.md`](https://github.com/jostraca/jostraca/blob/master/go/PORT_PLAN.md), and

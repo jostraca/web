@@ -28,8 +28,8 @@ const description =
     that callback touches nothing on disk, it records an in-memory tree. A second
     phase then walks the tree and writes it. Because the whole intended output is
     known before the first byte is written, a second run over code somebody edited
-    by hand has choices — preserve it, present the new version beside it, write a
-    diff, or perform a three-way merge — instead of one destructive default.
+    by hand has choices -  preserve it, present the new version beside it, write a
+    diff, or perform a three-way merge -  instead of one destructive default.
   </p>
 
   <p>
@@ -56,7 +56,7 @@ const description =
     runs its own authored examples against <code>{JOSTRACA_VERSION}</code>, the
     package it pins. The documentation pages are synced from the generator's
     repository, where each snippet is executed in a temporary directory by a
-    real process and compared against the file tree it wrote — against the code
+    Node.js process and compared against the file tree it wrote, using the code
     at that commit, which can be ahead of the published package. So a synced
     page cannot drift from the generator, but it can describe a release you have
     not installed yet. <a href="/versions.json">/versions.json</a> reports the
