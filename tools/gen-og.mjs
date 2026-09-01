@@ -42,16 +42,16 @@ function token(name) {
 const title = konst("SITE_TITLE");
 const tagline = konst("SITE_TAGLINE");
 const host = konst("SITE_HOST");
-const accent = token("--clay-800");
+const accent = token("--blue-700");
 const ground = token("--earth-50");
 const ink = token("--earth-900");
 const inkMuted = token("--earth-700");
 const mat = token("--earth-100");
 const matRule = token("--earth-300");
-const soft = token("--clay-100");
+const soft = token("--blue-100");
 const shadowInk = token("--earth-950");
 
-const ostracon = readFileSync(join(ROOT, "public/brand/ostracon.jpg")).toString("base64");
+const ostracon = readFileSync(join(ROOT, "public/brand/ostracon-restored.png")).toString("base64");
 
 const page = `<!doctype html><meta charset="utf-8"><style>
   *{box-sizing:border-box}
@@ -66,14 +66,14 @@ const page = `<!doctype html><meta charset="utf-8"><style>
   .mat{padding:38px;background:${mat};border:2px solid ${matRule};
        box-shadow:14px 16px 0 ${soft},0 20px 45px color-mix(in srgb,${shadowInk} 20%,transparent);
        transform:rotate(1.5deg)}
-  .ostracon{display:block;width:148px;height:200px;object-fit:cover;margin:auto;
+  .ostracon{display:block;width:166px;height:auto;margin:auto;
             box-shadow:0 8px 20px color-mix(in srgb,${shadowInk} 28%,transparent)}
   .host{position:absolute;bottom:52px;left:86px;font-size:25px;color:${accent};
         font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 </style>
 <div class="bar"></div>
 <div class="copy"><h1>${title}</h1><p>${tagline}.</p></div>
-<div class="mat"><img class="ostracon" src="data:image/jpeg;base64,${ostracon}"></div>
+<div class="mat"><img class="ostracon" src="data:image/png;base64,${ostracon}"></div>
 <div class="host">${host}</div>`;
 
 // playwright-core is a devDependency and brings no browser of its own, so it

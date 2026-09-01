@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <!-- The old site's ostracon reduced to its clay ground and drawn profile. -->
   <rect width="32" height="32" rx="3" fill="#ddc8ae"/>
-  <rect x="2" y="2" width="28" height="28" rx="2" fill="none" stroke="#7b3d29"/>
-  <g fill="none" stroke="#4a2418" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="2" y="2" width="28" height="28" rx="2" fill="none" stroke="#3333ff"/>
+  <g fill="none" stroke="#000066" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
     <path d="M9 7c4-3 10-2 13 1 2 2 2 6 0 9l-3 2v5l-5 2v-7c-3-1-5-4-5-7z"/>
     <path d="M20 11l3 2-3 1M15 9v7"/>
   </g>
