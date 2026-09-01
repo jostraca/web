@@ -48,14 +48,14 @@
   --clay-200: #eac9b5;
   --clay-100: #f5e3d7;
 
-  /* The original site's link blue: bright cobalt with an ink-blue depth. */
-  --blue-900: #000066;
-  --blue-800: #11118f;
-  --blue-700: #2020c2;
-  --blue-600: #3333ff;
-  --blue-300: #aaaaff;
-  --blue-200: #ccccff;
-  --blue-100: #e8e8ff;
+  /* The original site's cobalt, weathered toward mineral ink. */
+  --blue-900: #1f3150;
+  --blue-800: #29436e;
+  --blue-700: #355684;
+  --blue-600: #486b9b;
+  --blue-300: #aabbd0;
+  --blue-200: #ced8e5;
+  --blue-100: #e7edf4;
 
   /* 2 ── semantic tokens ─────────────────────────────────────────── */
 
@@ -75,6 +75,9 @@
   --primary-hover: var(--blue-900);
   --primary-soft: var(--blue-100);
   --on-primary: var(--plaster);
+
+  --secondary: var(--clay-800);
+  --secondary-soft: var(--clay-100);
 
   --focus: var(--blue-600);
   --wash: color-mix(in srgb, var(--earth-100) 68%, transparent);
@@ -116,6 +119,9 @@
     --primary-soft: var(--blue-900);
     --on-primary: var(--earth-950);
 
+    --secondary: var(--clay-300);
+    --secondary-soft: var(--clay-900);
+
     --focus: var(--blue-200);
   }
 }
@@ -137,6 +143,9 @@
   --primary-hover: var(--blue-300);
   --primary-soft: var(--blue-900);
   --on-primary: var(--earth-950);
+
+  --secondary: var(--clay-300);
+  --secondary-soft: var(--clay-900);
 
   --focus: var(--blue-200);
 }
