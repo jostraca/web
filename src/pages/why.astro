@@ -48,6 +48,8 @@ const RESULT_MERGE = `out/config.sh
   HOST=localhost
   DEBUG=1`;
 
+const DIALECT_TAG = '{% for item in items %}'
+
 const EXAMPLE_LOOP = `import { Jostraca, Project, File, Content, each } from 'jostraca'
 
 const routes = [
@@ -142,7 +144,7 @@ const description =
       Jostraca keeps under <code>.jostraca/</code> beside the output. Anything
       in the file that is not in the base is somebody's edit; anything the
       generator changed since the base is the generator's. The two are combined
-      the way a version control merge combines them, conflict markers and all
+      the way a version control merge combines them, conflict markers, and all
       when they cannot both hold.
     </p>
 
@@ -180,10 +182,44 @@ const description =
     <pre><code>{RESULT_LOOP}</code></pre>
 
     <p>
-      There is a template syntax, and it is deliberately small:
-      <code>$$path$$</code> substitutes a value from the model, and that is
-      all it does. No conditionals, no loops, no expressions. Anything harder
-      belongs in the code around it, where you can test it.
+      There is a substitution syntax, and it is deliberately small:
+      <code>$$path$$</code> reads a value from the model, and that is all it
+      does. No conditionals, no loops, no expressions, no filters. Anything
+      harder belongs in the code around it, where you can test it. Being
+      unable to grow is the feature: a syntax that gains a conditional gains a
+      loop next, and ends up a second language with worse tooling than the one
+      you started in.
+    </p>
+
+    <h2 id="valid-source">Templates that are still valid source</h2>
+
+    <p>
+      The other half of this matters more in practice than the argument about
+      dialects, because you meet it every time you open the file. Where
+      Jostraca does use a template file, the marker is allowed to sit inside
+      the target language&rsquo;s own comment syntax:
+    </p>
+
+    <pre><code>&lt;!-- &lt;[SLOT:head]&gt; --&gt;    valid HTML
+// &lt;[SLOT:head]&gt;          valid Go, C, JavaScript
+/* &lt;[SLOT:head]&gt; */      valid CSS
+# &lt;[SLOT:head]&gt;           valid shell, Python, YAML
+-- &lt;[SLOT:head]&gt;          valid SQL</code></pre>
+
+    <p>
+      So the template is a legal file of its own type. It opens, highlights,
+      formats, and lints like anything else in the repository, and a browser
+      will render the HTML one directly. Compare a file carrying
+      <code>{DIALECT_TAG}</code>: it is valid in neither language,
+      so highlighting gives up or wants a plugin, the formatter cannot parse
+      it, the linter cannot check it, and nothing can tell you what it
+      produces short of rendering it.
+    </p>
+
+    <p>
+      This is why the substitution syntax is <code>$$path$$</code> rather than
+      something more expressive. It has to fit inside a string literal or a
+      comment without breaking the file around it.
     </p>
 
     <h2 id="cost">What it costs</h2>

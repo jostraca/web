@@ -19,7 +19,7 @@ go get github.com/jostraca/jostraca/go
 ```
 
 TypeScript is the source of truth. When the two disagree, TypeScript
-wins and Go is the one that changes - see the
+wins and Go is the one that changes—see the
 [explanation](/docs/explanation#two-implementations) for why that rule and
 not a better-looking one.
 
@@ -92,7 +92,7 @@ more than one prop, a `…P` variant taking a props struct.
 | method | props struct | fields |
 |---|---|---|
 | `Project(ProjectProps, body)` | `ProjectProps` | `Name`, `Folder` |
-| `Folder(name, body)` | - | - |
+| `Folder(name, body)` |—|—|
 | `File(name, body)` / `FileP(FileProps, body)` | `FileProps` | `Name`, `Exclude any`, `Mode fs.FileMode` |
 | `Content(src)` / `ContentP(ContentProps)` | `ContentProps` | `Src`, `Name`, `Indent any`, `Replace map[string]any`, `Extra map[string]any` |
 | `Line(src)` / `LineP(ContentProps)` | as `Content` | |
@@ -100,11 +100,33 @@ more than one prop, a `…P` variant taking a props struct.
 | `Slot(name, body)` / `SlotP(SlotProps, body)` | `SlotProps` | `Name` |
 | `Inject(name, body)` / `InjectP(InjectProps, body)` | `InjectProps` | `Name`, `Markers`, `Exclude` |
 | `Copy(CopyProps)` | `CopyProps` | `From`, `To`, `Exclude`, `Replace` |
-| `List(items, body)` / `ListP(ListProps, body)` | `ListProps` | `Item`, `Indent`, `NoLine`, `Replace` |
-| `Cmp(name, fn)` | - | a user component |
+| `List(items, body)` / `ListP(ListProps, body)` | `ListProps` | `Item`, `Indent`, `NoLine` |
+| `Cmp(name, fn)` |—| a user component |
 
-`List`'s body signature is `func(j *J, item any)`, so the item arrives
-as a parameter rather than through a props object.
+`List`'s body signature is `func(j *J, it ListItemProps)`, mirroring the
+`{item, indent, replace}` object TypeScript hands each child.
+`ListItemProps` carries `Item any`, `Indent any` and
+`Replace map[string]any`. The last two are meant to be passed straight
+through—neither does anything on its own:
+
+<!-- test: skip a Go sample; the body signature is pinned by go/list_item_test.go and the list_item_macro parity snapshot -->
+```go
+j.ListP(ListProps{Item: items, Indent: "  "}, func(j *J, it ListItemProps) {
+    j.ContentP(ContentProps{
+        Src:     "{item.name}: {item.role}\n",
+        Indent:  it.Indent,
+        Replace: it.Replace,
+    })
+})
+```
+
+`{item.path}` resolves with `GetX`, so nested paths work. The three quiet
+limits are the same as TypeScript's: a bare `{item}`, a `$`-suffixed key
+(`{item.index$}`), and an unresolved path all yield the empty string,
+unlike `$$path$$`, which is left in place.
+
+`ListProps` has no `Replace` field, matching TypeScript, where `List`'s
+own `replace` prop is accepted and never used.
 
 Semantics follow the [component reference](/docs/reference-components)
 unless the deviations below say otherwise.
@@ -124,43 +146,48 @@ WithControl(Control) WithBuild(bool)
 `OptionsFromMap` builds an `Options` from a decoded JSON or YAML map,
 for configuration that arrives as data.
 
-### `WithMem` and `WithVol` do nothing
+### `WithMem` and `WithVol`
 
-**`Options.Mem` and `Options.Vol` are inert in the Go port.** Nothing
-constructs an in-memory filesystem from them. A generator configured
-with `WithMem()` runs against the **real filesystem**, writes real
-files, and returns a result whose `Vol` and `FS` are both `nil` - with
-no error:
+`Mem` switches an in-memory filesystem on and `Vol` seeds it, matching
+TypeScript's `{mem: true}` and `vol`:
 
-<!-- test: skip a Go sample; the behaviour is stated from a compiled probe and is a deviation, not an API to copy -->
+<!-- test: skip a Go sample; the behaviour is stated from a compiled probe -->
 ```go
 j := jostraca.New(
 	jostraca.WithMem(),
 	jostraca.WithVol(map[string][]byte{"/tpl/x.txt": []byte("hi")}),
-	jostraca.WithFolder("./out"),
+	jostraca.WithFolder("/out"),
 )
 res, err := j.Generate(jostraca.Options{}, root)
-// err is nil, res.Vol is nil, res.FS is nil,
-// and ./out/a.txt exists on disk.
+// nothing touched the real filesystem;
+// res.Vol() holds the generated tree, res.FS() the provider.
 ```
 
-The working route is an explicit provider. Seed it by writing into it
-before generating:
+Three rules, all shared with TypeScript:
 
-<!-- test: skip a Go sample; the in-memory route, from the same compiled probe -->
+- **`Vol` without `Mem` does nothing.** `Mem` is the switch.
+- **An explicit provider beats both.** `WithFS(mem)` wins over `WithMem()`,
+  as `opts.fs` wins there.
+- **A global `Mem` is reused across `Generate` calls**, so a second run
+  regenerates over the first run's output—unless that call passes its own
+  `Vol`, which seeds a fresh volume.
+
+An explicit provider is still the right choice when a test wants to seed
+the filesystem by writing into it:
+
+<!-- test: skip a Go sample; the explicit-provider route -->
 ```go
 mem := jostraca.NewMemFS()
 j := jostraca.New(jostraca.WithFS(mem), jostraca.WithFolder("/out"))
 
 res, err := j.Generate(jostraca.Options{}, root)
-// nothing touched the real filesystem;
 // mem.ReadFile("/out/a.txt") returns the generated bytes.
 ```
 
-This is the sharpest difference from TypeScript, where `{mem: true}` is
-the documented in-memory harness and `vol` seeds it. Do not translate a
-TypeScript in-memory test by keeping `mem` and `vol`: it will pass while
-writing to your working directory.
+Until v0.35.0 both options were inert: `WithMem()` ran against the real
+filesystem and returned `Vol` and `FS` as `nil` with no error, so a
+TypeScript in-memory test translated across by keeping `mem` and `vol`
+passed while writing to the working directory. See #37.
 
 ### Per-call `Cmp` and `Name` are dropped
 
@@ -171,8 +198,8 @@ no `WithCmp`. Verified with a `Copy` and an ignore pattern:
 
 | where the ignore list was set | what was copied |
 |---|---|
-| `Generate(Options{Cmp: …})` | `keep.txt` **and** `skip.log` - ignored |
-| a global option on `New` | `keep.txt` only - honoured |
+| `Generate(Options{Cmp: …})` | `keep.txt` **and** `skip.log`—ignored |
+| a global option on `New` | `keep.txt` only—honoured |
 
 So the only route to `Options.Cmp.Copy.Ignore` today is a hand-written
 option closure passed to `New`:
@@ -220,6 +247,13 @@ type Files struct {
 
 `Audit` is `[]AuditEntry`, each `{Tag string; Data map[string]any}`.
 
+`Vol` snapshots the volume: every file's content, plus a **nil** entry for
+every empty directory. A directory appears only while it is empty—otherwise
+its children stand for it—mirroring TypeScript's
+`vol.toJSON()`, which records one as `null`. An empty *file* is a non-nil
+zero-length slice, so a caller that wants files alone should test
+`v != nil` rather than `len(v) > 0`.
+
 ## Utilities
 
 The same helper surface, capitalised, plus narrower variants where Go
@@ -253,6 +287,11 @@ can agree on.
 Every difference below is deliberate, and each is either Go idiom or a
 consequence of the language.
 
+`go/README.md` carries the same set for a reader who is already in the
+repository. The two lists are not line-for-line: this one groups a few
+items that one keeps separate, and covers others in the preceding sections
+rather than as bullets. Neither omits anything the other has.
+
 **Shape of the API**
 
 - Components are methods on `*J`, not free functions. Receiver-shadowing
@@ -272,7 +311,7 @@ is no sort-by-property in Go.
 
 **Language limits**
 
-- Go's `regexp` is RE2 and has no lookbehind, so a user-supplied regex
+- Go's `regexp` is RE2 and has no lookbehind, so a user-supplied regular expression
   key containing `(?<=…)` is rejected at compile time.
 - A template value that is an integer wider than 2^53 keeps its exact
   value in Go and loses precision in TypeScript, where every number is a
@@ -288,21 +327,76 @@ is no sort-by-property in Go.
   skips `undefined`, while a `nil` map value or slice element
   overwrites, as TypeScript's `null` does. Only `[]any` merges by index;
   a typed slice such as `[]string` takes the right-wins path, as does
-  any value carrying a type of its own - which is TypeScript's
+  any value carrying a type of its own—which is TypeScript's
   custom-constructor rule.
-- **`WithMem` and `WithVol` are inert**, and the option merge drops
-  per-call `Cmp` and `Name`. Both are described above, with what to do
-  instead. Neither is in `go/README.md`'s own deviations list.
-- `J.Cmp` runs its body inline without allocating a node, where the
-  TypeScript `cmp()` allocates one and routes it through the fragment
-  filter. So a user component used as a direct `Fragment` child is a
-  non-`Slot` child in TypeScript and invisible in Go, and the
-  "non-`Slot` child with no unnamed marker" error fires in TypeScript
-  only. A component that *wraps* a `Slot` is broken in TypeScript today
- - the slot name is never collected and the marker survives verbatim -
-  and Go handles it. Reconciling means giving `Cmp` a node, which
-  changes the shape of every Go component tree, so it stands.
+- **The option merge drops per-call `Cmp` and `Name`**, so
+  `cmp.Copy.ignore` has to be set on `New`. Described earlier, with what to
+  do instead, and in `go/README.md`'s deviations list too.
+- A user component that *wraps* a `Slot` is broken in TypeScript—the
+  slot name is never collected and the marker survives verbatim—and Go
+  matches it. `J.Cmp` allocates a `kind: 'none'` node and passes through
+  the Fragment filter, as TypeScript's `cmp()` does, so a user component
+  used as a direct `Fragment` child behaves identically on both sides: the
+  filter rejects it on the scan, an unnamed `<[SLOT]>` marker accepts it
+  once, and without such a marker the build fails on both. Until v0.35.0
+  Go ran the body inline with no node, so the filter never saw it—three
+  runs against TypeScript's zero, and a silent body wrote the file where
+  TypeScript aborted. See #29.
+- A **binary** single-file `Copy` nested inside a `File` splices its raw
+  bytes into the enclosing file here; TypeScript contributes nothing and
+  logs it. A Go string is a byte string; TypeScript's copy content is a
+  `Buffer`, and joining one into a JS string UTF-8 decodes it, so every
+  byte that is not valid UTF-8 would become U+FFFD. TypeScript writes
+  nothing rather than a corrupted approximation. A **text** copy splices
+  identically on both sides, and the copy itself is written intact either
+  way.
+- A template macro resolving to a **`[]byte`** renders as Go's
+  `[104 105]`, and to a **pointer** as `&{1 x}`. Every other composite—maps,
+  slices, arrays and structs, of any element type—JSONifies with
+  keys sorted at every depth, matching TypeScript. Neither exception has
+  an obvious right answer: `encoding/json` renders a byte slice as base64
+  while TypeScript renders a `Buffer` through its `toJSON` as
+  `{"type":"Buffer","data":[…]}`, and dereferencing a pointer raises its
+  own questions about nil and about value-versus-reference. Both are
+  pinned so they cannot change by accident.
+- `ListItemProps.Item` is the **raw** item; TypeScript's `props.item` is
+  each-wrapped, so a scalar arrives there as `{val$, index$}`. `List`
+  iterates with `Raw` here and with `each`'s default annotation in
+  TypeScript. The `{item.path}` macro is unaffected: `getx` cannot address
+  a `$`-suffixed key on either stack, so `{item.val$}` and `{item.index$}`
+  yield the empty string in TypeScript too, and the item argument is the
+  documented route to a scalar on both sides.
 - `PointUtil` is not ported.
+
+**Consequences of Go's zero values**
+
+- A per-call `Control` cannot clear a global one. `Control` is a value
+  struct, so `Control{Dryrun: false}` is indistinguishable from "not
+  supplied" and the global wins. TypeScript can express "globally dry, but
+  write for this call". Closing it needs pointer fields.
+- `FileProps.Mode` of `0` means "unset", so the file keeps its default
+  `0644`. TypeScript treats `mode: 0` as a request and writes an
+  unreadable `0o000` file.
+
+**Permission bits**
+
+- Special bits use Go's encoding rather than POSIX octal. `fs.FileMode`
+  keeps setuid at `fs.ModeSetuid`, not at `0o4000`, so TypeScript's
+  `mode: 0o4755` is written `0o755 | fs.ModeSetuid` here. The resulting
+  file is identical; a literal `0o4755` is not setuid in Go and lands as
+  `0755`.
+
+**Known gaps, tracked**
+
+- Template replace keys of equal length tie-break alphabetically here and by
+  declaration order in TypeScript, which sorts insertion-ordered
+  `Object.keys()` with a stable sort. A Go map has no declaration order to
+  reproduce. The two agree whenever declaration order is alphabetical.
+- An eject marker given as a slash-wrapped string (`"/START.*/"`) is
+  compiled as a regular expression here and matched literally by
+  TypeScript. Passing a
+  real regular-expression value behaves the same on both sides. TypeScript is
+  canonical, so Go is the side to change.
 
 ## Concurrency
 
@@ -317,20 +411,22 @@ two copies of the package interoperate.
 
 ## Parity, and where it is pinned
 
-Behaviour shared by both stacks is specified in
-[`../test/spec/`](https://github.com/jostraca/jostraca/tree/master/test/spec/): language-neutral TSV cases that
-`ts/test/spec.test.ts` and `go/spec_test.go` both read. An unknown case
+Behaviour shared by both stacks lives in
+[`test/spec/`](https://github.com/jostraca/jostraca/tree/HEAD/test/spec):
+language-neutral TSV cases that `ts/test/spec.test.ts` and
+`go/spec_test.go` both read. An unknown case
 is a hard failure on both sides, so a row cannot be silently skipped by
 one.
 
 Beyond that, `go/testdata/parity/` holds whole-scenario fixtures
 generated from canonical TypeScript, and CI regenerates them and fails
-on any diff - so a TypeScript change cannot leave the Go expectations
+on any diff—so a TypeScript change cannot leave the Go expectations
 stale.
 
-Design background is in [`go/PORT_PLAN.md`](https://github.com/jostraca/jostraca/blob/master/go/PORT_PLAN.md), and
-the per-phase implementation notes in
-[`go/BUILD_LOG.md`](https://github.com/jostraca/jostraca/blob/master/go/BUILD_LOG.md).
+Design background is in
+[`go/PORT_PLAN.md`](https://github.com/jostraca/jostraca/blob/HEAD/go/PORT_PLAN.md),
+and the per-phase implementation notes in
+[`go/BUILD_LOG.md`](https://github.com/jostraca/jostraca/blob/HEAD/go/BUILD_LOG.md).
 
 ## Build and test
 

@@ -35,6 +35,76 @@ const RESULT_TREE = `out/acme/package.json
 out/acme/src/index.js
   console.log("acme")`;
 
+// EXAMPLE_/RESULT_ so test/examples.test.mjs discovers and RUNS this:
+// the landing page's central claim is that a Jostraca template is still
+// a valid file of its own type, and a claim on this page is executed
+// like every other one. The generator writes the template first, so the
+// harness needs no input-file support.
+const EXAMPLE_TEMPLATE = `import { Jostraca, Project, File, Fragment, Slot, Content } from 'jostraca'
+
+const jostraca = Jostraca()
+
+// Write the template. It is a normal HTML file: both markers hide
+// inside HTML comments, so it still parses and highlights as HTML.
+await jostraca.generate({ folder: './tpl' }, () => {
+  Project({}, () => {
+    File({ name: 'page.html' }, () => {
+      Content('<!doctype html>\\n')
+      Content('<html>\\n')
+      Content('  <head>\\n')
+      Content('    <!-- <[SLOT:head]> -->\\n')
+      Content('  </head>\\n')
+      Content('  <body>\\n')
+      Content('    <!-- <[SLOT]> -->\\n')
+      Content('  </body>\\n')
+      Content('</html>\\n')
+    })
+  })
+})
+
+// Fill it in.
+await jostraca.generate({ folder: './out' }, () => {
+  Project({}, () => {
+    File({ name: 'index.html' }, () => {
+      Fragment({ from: '../tpl/page.html' }, () => {
+        Slot({ name: 'head' }, () => Content('<title>acme</title>'))
+        Content('<h1>acme</h1>')
+      })
+    })
+  })
+})`;
+
+const RESULT_TEMPLATE = `out/index.html
+  <!doctype html>
+  <html>
+    <head>
+  <title>acme</title>
+    </head>
+    <body>
+  <h1>acme</h1>
+    </body>
+  </html>
+tpl/page.html
+  <!doctype html>
+  <html>
+    <head>
+      <!-- <[SLOT:head]> -->
+    </head>
+    <body>
+      <!-- <[SLOT]> -->
+    </body>
+  </html>`;
+
+const TEMPLATE_DIALECT = `<!doctype html>
+<html>
+  <head>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <h1>{{ app.name }}</h1>
+  </body>
+</html>`;
+
 const EXAMPLE_PRESERVE = `import { appendFileSync } from 'node:fs'
 import { Jostraca, Project, File, Content } from 'jostraca'
 
@@ -78,6 +148,11 @@ out/notes.txt
         file before it writes one, so you can overwrite, preserve, present,
         diff, or merge on the second run.
       </p>
+      <p class="lede-2">
+        And there is no template syntax to learn. You write ordinary code, or
+        you mark up a file that is still valid HTML, Go, or SQL &mdash; so your
+        editor, formatter, and linter never notice the difference.
+      </p>
 
       <div class="cta">
         <a class="button" href="/docs/tutorial">Start the tutorial</a>
@@ -100,7 +175,7 @@ out/notes.txt
       <p>
         <code>$$app.name$$</code> reaches into the model you passed to
         <code>Jostraca()</code> and substitutes the value. That happens inside
-        file content. Names are plain JavaScript, as the folder above shows,
+        file content. Names are plain JavaScript, as the preceding folder shows,
         because a component call is a function call and you already have a
         language for that.
       </p>
@@ -116,6 +191,71 @@ out/notes.txt
         <pre><code>{RESULT_TREE}</code></pre>
       </figure>
     </div>
+  </section>
+
+  <section class="no-dialect">
+    <h2>No template syntax to learn</h2>
+    <p class="section-lede">
+      Two ways to produce a file. Neither one is a dialect.
+    </p>
+
+    <div class="two-ways">
+      <div>
+        <h3>Write code</h3>
+        <p>
+          Components are function calls in the language you are already in.
+          Iteration is <code>for</code>. Branching is <code>if</code>. Reuse is
+          a function. Your debugger, type checker, formatter, and test runner
+          keep working, because nothing here is new to them.
+        </p>
+      </div>
+      <div>
+        <h3>Or mark up a real file</h3>
+        <p>
+          When a file reads better as a file, keep it as one. The marker is
+          allowed to sit inside the target language&rsquo;s own comment syntax,
+          so the template is still valid HTML &mdash; or Go, or SQL, or YAML.
+        </p>
+      </div>
+    </div>
+
+    <div class="panes">
+      <figure>
+        <figcaption>gen.mjs</figcaption>
+        <pre><code>{EXAMPLE_TEMPLATE}</code></pre>
+      </figure>
+      <figure>
+        <figcaption>what it wrote</figcaption>
+        <pre><code>{RESULT_TEMPLATE}</code></pre>
+      </figure>
+    </div>
+
+    <p>
+      <code>tpl/page.html</code> is valid HTML. A browser renders it, a
+      formatter formats it, a linter checks it, and your editor highlights it,
+      because every character in it belongs to HTML. Both markers are HTML
+      comments.
+    </p>
+
+    <p>
+      Compare the same page written for a template language. This one is
+      neither valid HTML nor valid Python: it belongs to a third language that
+      only the template engine reads, so highlighting gives up or wants a
+      plugin, the formatter cannot parse it, and the only way to find out what
+      it produces is to render it.
+    </p>
+
+    <figure class="dialect">
+      <figcaption>the same page in a template language</figcaption>
+      <pre><code>{TEMPLATE_DIALECT}</code></pre>
+    </figure>
+    <p>
+      <code>$$app.name$$</code> follows the same rule. It sits where the host
+      language already expects arbitrary text, reads one value from your model,
+      and does nothing else. No conditionals, no loops, no expressions, no
+      filters. It cannot grow into a second language, which is the whole reason
+      it stays this small.
+    </p>
   </section>
 
   <section class="second-run">
@@ -298,6 +438,53 @@ out/notes.txt
     poor first thing for a landing page to do with its code. The short
     install pair keeps its columns below.
   */
+  /* The two-ways split above the side-by-side templates. Same
+     one-column-then-two behaviour as .panes, so the section reads in a
+     single column on a phone. */
+  .lede-2 {
+    margin-top: 12px;
+    opacity: 0.85;
+  }
+
+  @media (min-width: 860px) {
+    .no-dialect .panes {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .dialect {
+    margin: 20px 0 0;
+  }
+
+  .no-dialect .section-lede {
+    font-size: 1.05rem;
+    opacity: 0.85;
+    margin-top: -4px;
+  }
+
+  .two-ways {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  .two-ways h3 {
+    margin: 0 0 6px;
+    font-size: 1rem;
+  }
+
+  .two-ways p {
+    margin: 0;
+  }
+
+  @media (min-width: 700px) {
+    .two-ways {
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+  }
+
   .panes {
     display: grid;
     grid-template-columns: 1fr;

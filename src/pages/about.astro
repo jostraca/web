@@ -12,7 +12,7 @@ import {
 const title = "About";
 const description =
   "What Jostraca is, who maintains it, how it is tested, and what the two " +
-  "implementations guarantee each other.";
+  "implementations check each other.";
 ---
 
 <Prose
@@ -28,8 +28,8 @@ const description =
     that callback touches nothing on disk, it records an in-memory tree. A second
     phase then walks the tree and writes it. Because the whole intended output is
     known before the first byte is written, a second run over code somebody edited
-    by hand has choices -  preserve it, present the new version beside it, write a
-    diff, or perform a three-way merge -  instead of one destructive default.
+    by hand has choices&mdash;preserve it, present the new version beside it, write a
+    diff, or perform a three-way merge&mdash;instead of one destructive default.
   </p>
 
   <p>
@@ -37,6 +37,15 @@ const description =
     once and dangerous twice; the cost of making the second run safe is the
     two-phase design, and the <a href="/docs/explanation">explanation</a> argues it
     in full, including what it costs.
+  </p>
+
+  <p>
+    There is no template language in any of this. Components are function calls,
+    so iteration and branching are the ones your language already has. Where
+    Jostraca does read a template file, the marker sits inside the target
+    language&rsquo;s own comment syntax, which leaves the file valid HTML, or Go,
+    or SQL &mdash; and leaves your editor, formatter, and linter with nothing new
+    to learn. <a href="/why#valid-source">Why that matters</a>.
   </p>
 
   <h2 id="implementations">Two implementations, held together</h2>
@@ -69,7 +78,7 @@ const description =
     Jostraca is written and maintained by
     <a href={AUTHOR.url} rel="noopener">{AUTHOR.name}</a>, who has been building
     and writing about component-oriented systems in Node.js for a long time. The
-    project is MIT licensed. Contributions, bug reports and corrections are
+    project is MIT licensed. Contributions, bug reports, and corrections are
     welcome through the issue tracker; see <a href="/contact">contact</a>.
   </p>
 
