@@ -35,15 +35,65 @@ const RESULT_TREE = `out/acme/package.json
 out/acme/src/index.js
   console.log("acme")`;
 
-const TEMPLATE_VALID = `<!doctype html>
-<html>
-  <head>
-    <!-- <[SLOT:head]> -->
-  </head>
-  <body>
-    <h1>$$app.name$$</h1>
-  </body>
-</html>`
+// EXAMPLE_/RESULT_ so test/examples.test.mjs discovers and RUNS this:
+// the landing page's central claim is that a Jostraca template is still
+// a valid file of its own type, and a claim on this page is executed
+// like every other one. The generator writes the template first, so the
+// harness needs no input-file support.
+const EXAMPLE_TEMPLATE = `import { Jostraca, Project, File, Fragment, Slot, Content } from 'jostraca'
+
+const jostraca = Jostraca()
+
+// Write the template. It is a normal HTML file: both markers hide
+// inside HTML comments, so it still parses and highlights as HTML.
+await jostraca.generate({ folder: './tpl' }, () => {
+  Project({}, () => {
+    File({ name: 'page.html' }, () => {
+      Content('<!doctype html>\\n')
+      Content('<html>\\n')
+      Content('  <head>\\n')
+      Content('    <!-- <[SLOT:head]> -->\\n')
+      Content('  </head>\\n')
+      Content('  <body>\\n')
+      Content('    <!-- <[SLOT]> -->\\n')
+      Content('  </body>\\n')
+      Content('</html>\\n')
+    })
+  })
+})
+
+// Fill it in.
+await jostraca.generate({ folder: './out' }, () => {
+  Project({}, () => {
+    File({ name: 'index.html' }, () => {
+      Fragment({ from: '../tpl/page.html' }, () => {
+        Slot({ name: 'head' }, () => Content('<title>acme</title>'))
+        Content('<h1>acme</h1>')
+      })
+    })
+  })
+})`;
+
+const RESULT_TEMPLATE = `out/index.html
+  <!doctype html>
+  <html>
+    <head>
+  <title>acme</title>
+    </head>
+    <body>
+  <h1>acme</h1>
+    </body>
+  </html>
+tpl/page.html
+  <!doctype html>
+  <html>
+    <head>
+      <!-- <[SLOT:head]> -->
+    </head>
+    <body>
+      <!-- <[SLOT]> -->
+    </body>
+  </html>`;
 
 const TEMPLATE_DIALECT = `<!doctype html>
 <html>
@@ -51,11 +101,9 @@ const TEMPLATE_DIALECT = `<!doctype html>
     {% block head %}{% endblock %}
   </head>
   <body>
-    {% if app.title %}
-      <h1>{{ app.name|title }}</h1>
-    {% endif %}
+    <h1>{{ app.name }}</h1>
   </body>
-</html>`
+</html>`;
 
 const EXAMPLE_PRESERVE = `import { appendFileSync } from 'node:fs'
 import { Jostraca, Project, File, Content } from 'jostraca'
@@ -173,23 +221,34 @@ out/notes.txt
 
     <div class="panes">
       <figure>
-        <figcaption>page.html &mdash; a Jostraca template</figcaption>
-        <pre><code>{TEMPLATE_VALID}</code></pre>
+        <figcaption>gen.mjs</figcaption>
+        <pre><code>{EXAMPLE_TEMPLATE}</code></pre>
       </figure>
       <figure>
-        <figcaption>the same page in a template language</figcaption>
-        <pre><code>{TEMPLATE_DIALECT}</code></pre>
+        <figcaption>what it wrote</figcaption>
+        <pre><code>{RESULT_TEMPLATE}</code></pre>
       </figure>
     </div>
 
     <p>
-      The file on the left is valid HTML. A browser renders it, a formatter
-      formats it, a linter checks it, and your editor highlights it, because
-      every character in it belongs to HTML. The file on the right is valid
-      HTML and valid Python and valid neither: highlighting gives up or wants a
+      <code>tpl/page.html</code> is valid HTML. A browser renders it, a
+      formatter formats it, a linter checks it, and your editor highlights it,
+      because every character in it belongs to HTML. Both markers are HTML
+      comments.
+    </p>
+
+    <p>
+      Compare the same page written for a template language. This one is
+      neither valid HTML nor valid Python: it belongs to a third language that
+      only the template engine reads, so highlighting gives up or wants a
       plugin, the formatter cannot parse it, and the only way to find out what
       it produces is to render it.
     </p>
+
+    <figure class="dialect">
+      <figcaption>the same page in a template language</figcaption>
+      <pre><code>{TEMPLATE_DIALECT}</code></pre>
+    </figure>
     <p>
       <code>$$app.name$$</code> follows the same rule. It sits where the host
       language already expects arbitrary text, reads one value from your model,
@@ -385,6 +444,16 @@ out/notes.txt
   .lede-2 {
     margin-top: 12px;
     opacity: 0.85;
+  }
+
+  @media (min-width: 860px) {
+    .no-dialect .panes {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .dialect {
+    margin: 20px 0 0;
   }
 
   .no-dialect .section-lede {
