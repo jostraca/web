@@ -35,6 +35,28 @@ const RESULT_TREE = `out/acme/package.json
 out/acme/src/index.js
   console.log("acme")`;
 
+const TEMPLATE_VALID = `<!doctype html>
+<html>
+  <head>
+    <!-- <[SLOT:head]> -->
+  </head>
+  <body>
+    <h1>$$app.name$$</h1>
+  </body>
+</html>`
+
+const TEMPLATE_DIALECT = `<!doctype html>
+<html>
+  <head>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    {% if app.title %}
+      <h1>{{ app.name|title }}</h1>
+    {% endif %}
+  </body>
+</html>`
+
 const EXAMPLE_PRESERVE = `import { appendFileSync } from 'node:fs'
 import { Jostraca, Project, File, Content } from 'jostraca'
 
@@ -78,6 +100,11 @@ out/notes.txt
         file before it writes one, so you can overwrite, preserve, present,
         diff, or merge on the second run.
       </p>
+      <p class="lede-2">
+        And there is no template syntax to learn. You write ordinary code, or
+        you mark up a file that is still valid HTML, Go, or SQL &mdash; so your
+        editor, formatter, and linter never notice the difference.
+      </p>
 
       <div class="cta">
         <a class="button" href="/docs/tutorial">Start the tutorial</a>
@@ -100,7 +127,7 @@ out/notes.txt
       <p>
         <code>$$app.name$$</code> reaches into the model you passed to
         <code>Jostraca()</code> and substitutes the value. That happens inside
-        file content. Names are plain JavaScript, as the folder above shows,
+        file content. Names are plain JavaScript, as the preceding folder shows,
         because a component call is a function call and you already have a
         language for that.
       </p>
@@ -116,6 +143,60 @@ out/notes.txt
         <pre><code>{RESULT_TREE}</code></pre>
       </figure>
     </div>
+  </section>
+
+  <section class="no-dialect">
+    <h2>No template syntax to learn</h2>
+    <p class="section-lede">
+      Two ways to produce a file. Neither one is a dialect.
+    </p>
+
+    <div class="two-ways">
+      <div>
+        <h3>Write code</h3>
+        <p>
+          Components are function calls in the language you are already in.
+          Iteration is <code>for</code>. Branching is <code>if</code>. Reuse is
+          a function. Your debugger, type checker, formatter, and test runner
+          keep working, because nothing here is new to them.
+        </p>
+      </div>
+      <div>
+        <h3>Or mark up a real file</h3>
+        <p>
+          When a file reads better as a file, keep it as one. The marker is
+          allowed to sit inside the target language&rsquo;s own comment syntax,
+          so the template is still valid HTML &mdash; or Go, or SQL, or YAML.
+        </p>
+      </div>
+    </div>
+
+    <div class="panes">
+      <figure>
+        <figcaption>page.html &mdash; a Jostraca template</figcaption>
+        <pre><code>{TEMPLATE_VALID}</code></pre>
+      </figure>
+      <figure>
+        <figcaption>the same page in a template language</figcaption>
+        <pre><code>{TEMPLATE_DIALECT}</code></pre>
+      </figure>
+    </div>
+
+    <p>
+      The file on the left is valid HTML. A browser renders it, a formatter
+      formats it, a linter checks it, and your editor highlights it, because
+      every character in it belongs to HTML. The file on the right is valid
+      HTML and valid Python and valid neither: highlighting gives up or wants a
+      plugin, the formatter cannot parse it, and the only way to find out what
+      it produces is to render it.
+    </p>
+    <p>
+      <code>$$app.name$$</code> follows the same rule. It sits where the host
+      language already expects arbitrary text, reads one value from your model,
+      and does nothing else. No conditionals, no loops, no expressions, no
+      filters. It cannot grow into a second language, which is the whole reason
+      it stays this small.
+    </p>
   </section>
 
   <section class="second-run">
@@ -298,6 +379,43 @@ out/notes.txt
     poor first thing for a landing page to do with its code. The short
     install pair keeps its columns below.
   */
+  /* The two-ways split above the side-by-side templates. Same
+     one-column-then-two behaviour as .panes, so the section reads in a
+     single column on a phone. */
+  .lede-2 {
+    margin-top: 12px;
+    opacity: 0.85;
+  }
+
+  .no-dialect .section-lede {
+    font-size: 1.05rem;
+    opacity: 0.85;
+    margin-top: -4px;
+  }
+
+  .two-ways {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  .two-ways h3 {
+    margin: 0 0 6px;
+    font-size: 1rem;
+  }
+
+  .two-ways p {
+    margin: 0;
+  }
+
+  @media (min-width: 700px) {
+    .two-ways {
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+  }
+
   .panes {
     display: grid;
     grid-template-columns: 1fr;

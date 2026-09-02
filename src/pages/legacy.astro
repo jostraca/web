@@ -39,10 +39,19 @@ const ARCHIVE =
 
   <p>
     Its supplied configurations covered Java, JavaScript, Perl, Python, Jython,
-    Ruby, Rebol and C. A Java 1.2 interpreter and compiler, plus a text editor,
+    Ruby, Rebol, and C. A Java 1.2 interpreter and compiler, plus a text editor,
     were the stated requirements. The project later gained an Ant task and an
     Eclipse plugin called CodeGenClipse. Release 0.4.1 also added JavaScript
     templates through Rhino.
+  </p>
+
+  <p>
+    The Java Server Pages syntax is the part the current design deliberately
+    dropped. A file with <code>&lt;% ... %&gt;</code> in it is valid in neither
+    language, which is what the Eclipse plugin existed to paper over. Today
+    there is <a href="/why#valid-source">no template syntax to learn</a>: you
+    write ordinary code, or you mark up a file that stays valid source in its
+    own language, and no editor needs a plugin to read it.
   </p>
 
   <h2 id="timeline">Release timeline</h2>
@@ -76,7 +85,7 @@ const ARCHIVE =
     The Java generator was distributed under version 2 of the GNU General Public
     License. Its site made a separate promise about output: code produced with
     Jostraca belonged entirely to the person who generated it. The generator did
-    not impose an IDE, technology or layout on that output.
+    not impose an IDE, technology, or layout on that output.
   </p>
 
   <h2 id="people">People</h2>
@@ -87,7 +96,7 @@ const ARCHIVE =
     Derek Conniffe for hardware and server work, Lars Grammel for the Ant task,
     Tim Buchalka for <code>build.xml</code>, and Chris Perdue for
     <code>CommandRunner</code>. They also thank Eoin Shanaghy, Godfrey Nolan,
-    Gerry Feeney, Alaister Moull, Conor Wyse and Caroline Hughes as reviewers.
+    Gerry Feeney, Alaister Moull, Conor Wyse, and Caroline Hughes as reviewers.
   </p>
 
   <h2 id="today">What carried forward</h2>
@@ -104,7 +113,7 @@ const ARCHIVE =
   <p class="footnote">
     Read the
     <a href={ARCHIVE} rel="noopener">archived original site</a>, including its
-    manuals, examples, release notes and surviving downloads. It is historical
+    manuals, examples, release notes, and surviving downloads. It is historical
     material; use the <a href="/docs">current documentation</a> for this project.
   </p>
 </Prose>
