@@ -29,16 +29,32 @@ const skip = existsSync(DIST) ? false : "no dist/ — run npm run build";
 /**
  * The authored pages, as their markdown twins.
  *
- * Derived, not listed: src/pages/*.astro IS the authored set, because the
- * synced routes live in src/pages/docs/ and src/pages/how-to/, which are
- * directories and do not match. A page added tomorrow is covered tomorrow,
- * which a hand-maintained list would not manage.
+ * Derived, not listed, so a page added tomorrow is covered tomorrow. The line
+ * is DYNAMIC ROUTE vs static page, NOT top level vs subdirectory: the synced
+ * content is rendered by src/pages/docs/[...slug].astro and
+ * src/pages/how-to/[slug].astro, and a bracketed filename is what marks
+ * those. Sitting beside the second of them is src/pages/how-to/index.astro,
+ * which is authored prose — AGENTS.md names it in the authored set — and a
+ * first version of this function that filtered on depth missed it, leaving
+ * /how-to ungated on the very change that added the gate.
+ *
+ * An index maps to its directory's twin: how-to/index.astro renders /how-to,
+ * whose twin is dist/how-to.md.
  */
-function authored() {
-  return readdirSync(join(ROOT, "src", "pages"))
-    .filter((f) => f.endsWith(".astro"))
-    .map((f) => f.replace(/\.astro$/, ".md"))
-    .sort();
+function authored(dir = join(ROOT, "src", "pages"), prefix = "") {
+  const out = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) {
+      out.push(...authored(join(dir, entry.name), rel));
+      continue;
+    }
+    if (!entry.name.endsWith(".astro")) continue;
+    if (entry.name.includes("[")) continue;
+    const base = rel.replace(/\.astro$/, "");
+    out.push((base.endsWith("/index") ? base.slice(0, -"/index".length) : base) + ".md");
+  }
+  return out.sort();
 }
 
 function banned() {
