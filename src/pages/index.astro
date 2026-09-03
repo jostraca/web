@@ -18,8 +18,8 @@ const EXAMPLE_TREE = `import { Jostraca, Project, Folder, File, Content } from '
 
 await Jostraca().generate({ folder: './out' }, () => {
   Project({ folder: 'acme' }, () => {
-    File({ name: 'package.json' }, () => {
-      Content('{ "name": "acme" }\\n')
+    File({ name: 'README.md' }, () => {
+      Content('# Acme\\n')
     })
     Folder({ name: 'src' }, () => {
       File({ name: 'index.js' }, () => {
@@ -29,8 +29,8 @@ await Jostraca().generate({ folder: './out' }, () => {
   })
 })`;
 
-const RESULT_TREE = `out/acme/package.json
-  { "name": "acme" }
+const RESULT_TREE = `out/acme/README.md
+  # Acme
 out/acme/src/index.js
   console.log("acme")`;
 
@@ -155,6 +155,14 @@ const RESULT_MERGE = `out/config.sh
         <a class="button ghost" href="/how-to">How-to guides</a>
         <a class="button ghost" href="/docs">Read the docs</a>
       </div>
+
+      <p class="install-cta">
+        Install it now for {STACKS.map((s, i) => (
+          <>{i === 0 ? "" : i === STACKS.length - 1 ? " or " : ", "}<a
+            href={s.install}
+          >{s.name}</a></>
+        ))}.
+      </p>
     </div>
   </section>
 
@@ -170,10 +178,9 @@ const RESULT_MERGE = `out/config.sh
       </p>
       <p>
         Every name here is a plain string, because a component call is a
-        function call and you already have a language for that. Values that
-        come from a model, and the <code>$$app.name$$</code> substitution that
-        reads them, are in the
-        <a href="/docs/tutorial">tutorial</a>.
+        function call and you already have a language for that. Content that
+        varies with your data comes from a model, which the
+        <a href="/docs/tutorial">tutorial</a> introduces.
       </p>
     </div>
 
@@ -250,15 +257,17 @@ const RESULT_MERGE = `out/config.sh
     </p>
 
     <figure class="dialect">
-      <figcaption>the same page in a template language</figcaption>
-      <Code code={TEMPLATE_DIALECT} lang="html" />
+      <figcaption>
+        the same page in a template language &mdash; uncoloured, because
+        nothing here knows which engine wrote it
+      </figcaption>
+      <Code code={TEMPLATE_DIALECT} lang="text" />
     </figure>
+
     <p>
-      <code>$$app.name$$</code> follows the same rule. It sits where the host
-      language already expects arbitrary text, reads one value from your model,
-      and does nothing else. No conditionals, no loops, no expressions, no
-      filters. It cannot grow into a second language, which is the whole reason
-      it stays this small.
+      The difference is not cosmetic. Open the first file and every tool that
+      reads HTML already understands it. Open the second and each one has to be
+      told which engine produced it, or it falls back to plain text.
     </p>
   </section>
 
@@ -432,6 +441,15 @@ const RESULT_MERGE = `out/config.sh
     gap: 12px;
     margin-top: 28px;
     justify-content: center;
+  }
+
+  /* A fourth and fifth button would have made the row a menu. The two
+     install routes are the shortest path for a reader who has already
+     decided, so they sit under the buttons as a sentence instead. */
+  .install-cta {
+    margin-top: 14px;
+    font-size: 0.94rem;
+    color: var(--ink-muted);
   }
 
   .taste,

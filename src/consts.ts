@@ -57,11 +57,16 @@ export const NAV: { href: string; label: string }[] = [
 ];
 
 // The how-to group taxonomy: slug (as synced guides declare it), display
-// name, one-line blurb, in display order. The slugs are the same six the
+// name, one-line blurb, in display order. The slugs are the same seven the
 // generator repository's `ts/test/docs.test.ts` enforces on frontmatter; a
 // guide declaring anything else fails the content-collection schema here
 // and the docs suite there.
 export const HOWTO_GROUPS: { slug: string; name: string; blurb: string }[] = [
+  {
+    slug: "install",
+    name: "Install",
+    blurb: "Getting Jostraca into a project, in either implementation.",
+  },
   {
     slug: "compose",
     name: "Compose the output tree",
@@ -118,9 +123,21 @@ export const COMPONENTS: { name: string; blurb: string }[] = [
 // The implementations. The landing page states how many there are, and a
 // count typed into prose goes stale silently: this is the same reason MODES
 // and COMPONENTS live here rather than in the page that argues them.
-export const STACKS: { name: string; blurb: string }[] = [
-  { name: "TypeScript", blurb: "the npm package, and the canonical source" },
-  { name: "Go", blurb: "the module, a port held to the same shared corpus" },
+//
+// `install` is the guide that gets each one into a project. The hero links
+// both, so a reader who has decided arrives at the command rather than at a
+// table of contents.
+export const STACKS: { name: string; blurb: string; install: string }[] = [
+  {
+    name: "TypeScript",
+    blurb: "the npm package, and the canonical source",
+    install: "/how-to/install-typescript",
+  },
+  {
+    name: "Go",
+    blurb: "the module, a port held to the same shared corpus",
+    install: "/how-to/install-go",
+  },
 ];
 
 // The existing-file modes, the reason the project exists. Named here because

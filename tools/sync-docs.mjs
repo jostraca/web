@@ -34,13 +34,14 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const SITE = resolve(HERE, "..");
 
 const REPO = "https://github.com/jostraca/jostraca";
-// The generator's default branch is `master`. A blob URL on `main` 404s.
+// The generator's default branch is `main`. It was `master`, and GitHub still
+// 302s the old name, so the stale constant kept working and kept being wrong.
 //
 // And GitHub serves a directory under /tree/, not /blob/: a /blob/ URL for
 // `ts/` or `test/spec/` renders an error page rather than a listing. The
 // upstream index links three such directories, so this is not hypothetical.
-const BLOB = `${REPO}/blob/master/`;
-const TREE = `${REPO}/tree/master/`;
+const BLOB = `${REPO}/blob/main/`;
+const TREE = `${REPO}/tree/main/`;
 
 /**
  * The pages this site renders, in sidebar order.
@@ -123,12 +124,12 @@ const PAGES = [
 export const SECTIONS = ["Start", "Tutorial", "Reference", "Understanding"];
 
 /**
- * The how-to group taxonomy. The same six slugs are in `HOWTO_GROUPS` in
+ * The how-to group taxonomy. The same seven slugs are in `HOWTO_GROUPS` in
  * src/consts.ts, which owns their display names, blurbs and order, and in
  * upstream's `ts/test/docs.test.ts`. A guide declaring anything else fails
  * here, in the content-collection schema, and in that suite.
  */
-export const GROUPS = ["compose", "templates", "reuse", "regenerate", "files", "embed"];
+export const GROUPS = ["install", "compose", "templates", "reuse", "regenerate", "files", "embed"];
 
 /**
  * The site route for a repository path, or null where this site renders no
