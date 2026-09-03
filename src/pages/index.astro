@@ -36,39 +36,38 @@ out/acme/src/index.js
   console.log("acme")`;
 
 // EXAMPLE_/RESULT_ so test/examples.test.mjs discovers and RUNS this:
-// the landing page's central claim is that a Jostraca template is still
-// a valid file of its own type, and a claim on this page is executed
-// like every other one. The generator writes the template first, so the
-// harness needs no input-file support.
-const EXAMPLE_TEMPLATE = `import { Jostraca, Project, File, Fragment, Slot, Content } from 'jostraca'
+// the landing page's central claim is that a Jostraca template is still a
+// valid file of its own type, and a claim on this page is executed like
+// every other one. INPUT_ seeds the template into the run's filesystem, so
+// the example can show a template that already exists instead of writing
+// one first.
+const INPUT_TEMPLATE = `tpl/page.html
+  <!doctype html>
+  <html>
+    <head>
+      <title>APP_TITLE</title>
+    </head>
+    <body>
+      <h1>APP_NAME</h1>
+    </body>
+  </html>`;
 
-const jostraca = Jostraca()
+// The template as the page shows it: INPUT_TEMPLATE with its listing
+// indent removed, so the block a reader sees and the file the run reads are
+// the same string.
+const TEMPLATE_SOURCE = INPUT_TEMPLATE.split("\n").slice(1).map((l) => l.slice(2)).join("\n");
 
-// Write the template. It is a normal HTML file: both markers hide
-// inside HTML comments, so it still parses and highlights as HTML.
-await jostraca.generate({ folder: './tpl' }, () => {
-  Project({}, () => {
-    File({ name: 'page.html' }, () => {
-      Content('<!doctype html>\\n')
-      Content('<html>\\n')
-      Content('  <head>\\n')
-      Content('    <!-- <[SLOT:head]> -->\\n')
-      Content('  </head>\\n')
-      Content('  <body>\\n')
-      Content('    <!-- <[SLOT]> -->\\n')
-      Content('  </body>\\n')
-      Content('</html>\\n')
-    })
-  })
-})
+const EXAMPLE_TEMPLATE = `import { Jostraca, Project, File, Fragment } from 'jostraca'
 
-// Fill it in.
-await jostraca.generate({ folder: './out' }, () => {
+await Jostraca().generate({ folder: './out' }, () => {
   Project({}, () => {
     File({ name: 'index.html' }, () => {
-      Fragment({ from: '../tpl/page.html' }, () => {
-        Slot({ name: 'head' }, () => Content('<title>acme</title>'))
-        Content('<h1>acme</h1>')
+      Fragment({
+        from: '../tpl/page.html',
+        replace: {
+          APP_TITLE: 'acme',
+          APP_NAME: 'Acme',
+        },
       })
     })
   })
@@ -78,20 +77,10 @@ const RESULT_TEMPLATE = `out/index.html
   <!doctype html>
   <html>
     <head>
-  <title>acme</title>
+      <title>acme</title>
     </head>
     <body>
-  <h1>acme</h1>
-    </body>
-  </html>
-tpl/page.html
-  <!doctype html>
-  <html>
-    <head>
-      <!-- <[SLOT:head]> -->
-    </head>
-    <body>
-      <!-- <[SLOT]> -->
+      <h1>Acme</h1>
     </body>
   </html>`;
 
@@ -105,28 +94,28 @@ const TEMPLATE_DIALECT = `<!doctype html>
   </body>
 </html>`;
 
-const EXAMPLE_PRESERVE = `import { appendFileSync } from 'node:fs'
+const EXAMPLE_MERGE = `import { appendFileSync } from 'node:fs'
 import { Jostraca, Project, File, Content } from 'jostraca'
 
 const jostraca = Jostraca({
-  existing: { txt: { write: true, preserve: true } },
+  existing: { txt: { write: true, merge: true } },
 })
 
-const run = (text) => jostraca.generate({ folder: './out' }, () => {
-  Project({}, () => {
-    File({ name: 'notes.txt' }, () => Content(text))
-  })
+const run = (body) => jostraca.generate({ folder: './out' }, () => {
+  Project({}, () => File({ name: 'config.sh' }, () => Content(body)))
 })
 
-await run('first generate\\n')
-appendFileSync('./out/notes.txt', 'a line somebody added\\n')
-await run('second generate\\n')`;
+// First run. Then somebody adds a line by hand. Then the generator
+// changes a different line and runs again.
+await run('PORT=8080\\nHOST=localhost\\n')
+appendFileSync('./out/config.sh', 'DEBUG=1\\n')
+await run('PORT=9090\\nHOST=localhost\\n')`;
 
-const RESULT_PRESERVE = `out/notes.old.txt
-  first generate
-  a line somebody added
-out/notes.txt
-  second generate`;
+const RESULT_MERGE = `out/config.sh
+  PORT=9090
+  HOST=localhost
+  DEBUG=1`;
+
 ---
 
 <Base home>
@@ -212,12 +201,17 @@ out/notes.txt
       <div>
         <h3>Or mark up a real file</h3>
         <p>
-          When a file reads better as a file, keep it as one. The marker is
-          allowed to sit inside the target language&rsquo;s own comment syntax,
-          so the template is still valid HTML &mdash; or Go, or SQL, or YAML.
+          When a file reads better as a file, keep it as one. A marker is just
+          a name you chose, sitting where the file already allows text, so the
+          template stays valid HTML &mdash; or Go, or SQL, or YAML.
         </p>
       </div>
     </div>
+
+    <figure class="template-in">
+      <figcaption>tpl/page.html &mdash; an ordinary HTML file</figcaption>
+      <pre><code>{TEMPLATE_SOURCE}</code></pre>
+    </figure>
 
     <div class="panes">
       <figure>
@@ -233,8 +227,11 @@ out/notes.txt
     <p>
       <code>tpl/page.html</code> is valid HTML. A browser renders it, a
       formatter formats it, a linter checks it, and your editor highlights it,
-      because every character in it belongs to HTML. Both markers are HTML
-      comments.
+      because every character in it belongs to HTML. <code>APP_TITLE</code> and
+      <code>APP_NAME</code> are ordinary text that happens to be replaced. For a
+      file where a bare name would not be valid, the
+      <a href="/how-to/replace-markers-in-a-template">replace guide</a> covers
+      the marker forms that hide inside a comment.
     </p>
 
     <p>
@@ -279,12 +276,12 @@ out/notes.txt
 
     <div class="panes">
       <figure>
-        <figcaption>two runs, with an edit in between</figcaption>
-        <pre><code>{EXAMPLE_PRESERVE}</code></pre>
+        <figcaption>two runs, with a hand edit in between</figcaption>
+        <pre><code>{EXAMPLE_MERGE}</code></pre>
       </figure>
       <figure>
         <figcaption>what it wrote</figcaption>
-        <pre><code>{RESULT_PRESERVE}</code></pre>
+        <pre><code>{RESULT_MERGE}</code></pre>
       </figure>
     </div>
 
