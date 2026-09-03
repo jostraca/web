@@ -12,19 +12,33 @@
 // already runs this same list against them. A second gate on one fact is what
 // the sync exists to prevent.
 //
-// The list itself is not written here either — test/banned.txt is synced from
-// the generator's reject.txt, so the two repositories cannot drift apart on
-// what is banned. `npm run check-sync` fails when the copy is stale.
+// THE LIST IS NOT COPIED HERE. It is read straight out of the generator
+// checkout beside this one, the same `../jostraca` (or $JOSTRACA_REPO) that
+// tools/sync-docs.mjs uses. A committed copy — even a generated, gate-checked
+// one — is a second statement of one rule, and the gate that would catch it
+// drifting is inert in CI, where there is no sibling checkout to compare to.
+// So CI clones the generator instead, and this test reads the real file.
+//
+// Without that checkout the test SKIPS with a named reason rather than
+// passing: a lone clone of this repository degrades visibly, and never into a
+// false green.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = join(ROOT, "dist");
-const skip = existsSync(DIST) ? false : "no dist/ — run npm run build";
+
+const GENERATOR = resolve(process.env.JOSTRACA_REPO || join(ROOT, "..", "jostraca"));
+const REJECT = join(GENERATOR, ".vale/styles/config/vocabularies/Jostraca/reject.txt");
+const skip = !existsSync(DIST)
+  ? "no dist/ — run npm run build"
+  : !existsSync(REJECT)
+    ? `no generator checkout at ${GENERATOR} — the banned list lives there, set JOSTRACA_REPO or clone it beside this repository`
+    : false;
 
 /**
  * The authored pages, as their markdown twins.
@@ -58,7 +72,7 @@ function authored(dir = join(ROOT, "src", "pages"), prefix = "") {
 }
 
 function banned() {
-  return readFileSync(join(ROOT, "test", "banned.txt"), "utf8")
+  return readFileSync(REJECT, "utf8")
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line !== "" && !line.startsWith("#"))

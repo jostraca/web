@@ -29,6 +29,16 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # The generator, for its banned-phrase list. test/prose.test.mjs reads
+      # reject.txt out of this checkout rather than a copy committed here:
+      # one rule, one file, and no second statement of it to drift. Without
+      # it the prose test SKIPS, so this step is what makes that gate real
+      # in CI rather than merely present.
+      - uses: actions/checkout@v7
+        with:
+          repository: jostraca/jostraca
+          path: .jostraca
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -41,7 +51,20 @@ jobs:
       # run. Build first, and let a build failure fail here.
       - run: npm run build
 
+      # JOSTRACA_REPO points the prose test at the checkout above. If that
+      # step ever breaks, the test skips rather than fails -- so the run
+      # below asserts it did not, and a silent skip cannot pass for a pass.
       - run: npm test
+        env:
+          JOSTRACA_REPO: ${{ github.workspace }}/.jostraca
+
+      - name: The prose gate must have run, not skipped
+        env:
+          JOSTRACA_REPO: ${{ github.workspace }}/.jostraca
+        run: |
+          node --test test/prose.test.mjs 2>&1 | tee /tmp/prose.tap
+          grep -q '^# skipped 0$' /tmp/prose.tap \
+            || (echo 'prose gate skipped -- the generator checkout is missing' && exit 1)
 
       # Inert without a sibling generator checkout, which CI does not have.
       # Kept so the log says which mode it took rather than staying silent
