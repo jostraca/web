@@ -480,8 +480,22 @@ function collect(root) {
     );
   }
 
+  // The banned-phrase list, carried over verbatim so the authored pages here
+  // are held to the same list as the documentation upstream.
+  //
+  // COPIED RATHER THAN REIMPLEMENTED, and copied rather than fetched: the
+  // generator's reject.txt is the single source of truth, `--check` fails when
+  // this copy drifts, and a Cloudflare build that cloned only this repository
+  // still has the list on disk. A second hand-maintained list would be a
+  // second source of truth for one fact, which is what this whole tool exists
+  // to prevent.
+  out.set("test/banned.txt", read(REJECT));
+
   return out;
 }
+
+/** The generator's banned-phrase list, upstream of test/banned.txt here. */
+const REJECT = ".vale/styles/config/vocabularies/Jostraca/reject.txt";
 
 /** Directories this sync owns entirely — anything else in them is stale. */
 const OWNED = ["src/content/docs", "src/content/howto"];

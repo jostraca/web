@@ -135,8 +135,15 @@ repository's
 [`docs/STYLE-GUIDE.md`](https://github.com/jostraca/jostraca/blob/master/docs/STYLE-GUIDE.md)
 names this site in its own scope line, and it is normative for every sentence
 written here: the voice, the banned-phrase list, and the Diátaxis placement
-rules. Upstream enforces its half with a test; here the guide is a review
-obligation. Read it before writing or editing an authored page.
+rules. The banned-phrase half is enforced here as well, by
+`test/prose.test.mjs` over the markdown twin of every authored page. The
+list it reads, `test/banned.txt`, is SYNCED from the generator's
+`reject.txt` rather than written here, so the two repositories cannot
+disagree about what is banned; `npm run check-sync` fails when the copy
+drifts. The rest of the guide — the voice, the placement rules — is still a
+review obligation, and that half is what let two banned words reach the
+live site before the test existed. Read it before writing or editing an
+authored page.
 
 ## The pin
 

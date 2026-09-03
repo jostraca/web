@@ -1,0 +1,49 @@
+# Build the site and run its tests.
+#
+# THE SITE HAD NO CI AT ALL UNTIL THIS FILE. Cloudflare's git integration
+# builds and deploys on a push to main, which proves the site compiles and
+# nothing else: `npm test` never ran anywhere, so the 52 tests in test/ were
+# a thing a contributor could run rather than a thing that had to pass.
+#
+# That gap is how two banned words reached the live site. test/prose.test.mjs
+# now checks authored prose against the generator's banned list, and a gate
+# nobody runs would have caught them exactly as well as no gate did.
+#
+# No matrix: one runner, one Node. This builds a static site with a Worker in
+# front of it, not a library that has to work on somebody else's platform --
+# the version that matters is the one Cloudflare builds with.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      # The tests read dist/, so the build is not optional -- and a test that
+      # skips when dist/ is missing would turn a broken build into a green
+      # run. Build first, and let a build failure fail here.
+      - run: npm run build
+
+      - run: npm test
+
+      # Inert without a sibling generator checkout, which CI does not have.
+      # Kept so the log says which mode it took rather than staying silent
+      # about a check that did not happen.
+      - run: npm run check-sync
