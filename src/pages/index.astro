@@ -7,6 +7,7 @@ import {
   GITHUB_REPO,
   GO_MODULE,
   JOSTRACA_VERSION,
+  STACKS,
 } from "../consts";
 
 // The examples below are executed against the pinned package by
@@ -142,9 +143,11 @@ const RESULT_MERGE = `out/config.sh
       </p>
 
       <p class="stacks">
-        One generator, <strong>two implementations</strong>: a TypeScript
-        package and a Go module, built from one specification and held to the
-        same shared test corpus.
+        <strong>{STACKS.length} implementations</strong> of one
+        specification:
+        {STACKS.map((s, i) => (
+          <>{i === 0 ? " " : i === STACKS.length - 1 ? " and " : ", "}<strong>{s.name}</strong></>
+        ))}, held to the same shared test corpus.
       </p>
 
       <div class="cta">

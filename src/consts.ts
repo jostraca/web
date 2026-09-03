@@ -115,6 +115,14 @@ export const COMPONENTS: { name: string; blurb: string }[] = [
   { name: "List", blurb: "one block of content per item in an array" },
 ];
 
+// The implementations. The landing page states how many there are, and a
+// count typed into prose goes stale silently: this is the same reason MODES
+// and COMPONENTS live here rather than in the page that argues them.
+export const STACKS: { name: string; blurb: string }[] = [
+  { name: "TypeScript", blurb: "the npm package, and the canonical source" },
+  { name: "Go", blurb: "the module, a port held to the same shared corpus" },
+];
+
 // The existing-file modes, the reason the project exists. Named here because
 // the landing page argues them and the reference specifies them.
 export const MODES: { name: string; blurb: string }[] = [

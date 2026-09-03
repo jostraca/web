@@ -215,8 +215,10 @@ samp {
   was comparing two different things. github-dark's own neutral ground is
   what an editor looks like.
 
-  So only the dark palette is selected, and --bg-code matches it rather
-  than the surrounding page.
+  Only the dark palette is selected, and <pre> takes --code-ground to
+  match. INLINE code is untouched: it sits in body text, takes the body's
+  foreground, and keeps --bg-code, which follows the page. Driving both
+  from one token put dark inline code under dark body text at 1.97:1.
 */
 .astro-code,
 .astro-code span {
@@ -229,11 +231,11 @@ samp {
    page already reset it one at a time, and the third one added later did not
    -- so its code block hung 40px inside the two beside it. Reset once. */
 figure {
-  margin: 0;
+  margin-inline: 0;
 }
 
 pre {
-  background: var(--bg-code);
+  background: var(--code-ground);
   border: 1px solid var(--rule);
   border-radius: var(--radius);
   padding: 14px 16px;
