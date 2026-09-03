@@ -83,7 +83,7 @@ function pages(dir) {
  */
 function examples(source, where) {
   const found = new Map();
-  const re = /const\s+(EXAMPLE|RESULT)(?:_([A-Za-z0-9_]+))?\s*=\s*(`[\s\S]*?`)/g;
+  const re = /const\s+(EXAMPLE|RESULT|INPUT)(?:_([A-Za-z0-9_]+))?\s*=\s*(`[\s\S]*?`)/g;
   let m;
   let read = 0;
   while ((m = re.exec(source)) !== null) {
@@ -102,10 +102,10 @@ function examples(source, where) {
   // A binding written any other way (a quoted string, a concatenation) is
   // invisible to the regex above, and an example nobody runs is worse than no
   // example at all.
-  const declared = [...source.matchAll(/const\s+(?:EXAMPLE|RESULT)(?:_[A-Za-z0-9_]+)?\s*=/g)].length;
+  const declared = [...source.matchAll(/const\s+(?:EXAMPLE|RESULT|INPUT)(?:_[A-Za-z0-9_]+)?\s*=/g)].length;
   if (declared !== read) {
     throw new Error(
-      `${where}: ${declared} EXAMPLE/RESULT bindings, ${read} of them template literals this ` +
+      `${where}: ${declared} EXAMPLE/RESULT/INPUT bindings, ${read} of them template literals this ` +
         "suite can read; write every one as a backtick literal",
     );
   }
@@ -164,7 +164,7 @@ function listing(vol) {
  * example's own `node:fs` is a proxy onto that same filesystem, resolved at
  * call time because it does not exist until the first generate has run.
  */
-async function run(source, where) {
+async function run(source, where, seed) {
   const volumes = new Set();
   let live = null;
 
@@ -193,7 +193,16 @@ async function run(source, where) {
   );
 
   const Jostraca = (gopts) => {
-    const instance = jostraca.Jostraca({ ...(gopts ?? {}), mem: true });
+    // `vol` seeds the in-memory filesystem, which is how an example can show
+    // a template that ALREADY EXISTS rather than one the generator has to
+    // write first. Without it the only way to put a file where a Fragment
+    // could read it was a preliminary generate, and that step is scaffolding
+    // the reader has to skip past to reach the point.
+    const instance = jostraca.Jostraca({
+      ...(gopts ?? {}),
+      mem: true,
+      ...(seed ? { vol: seed } : {}),
+    });
     return {
       ...instance,
       generate: async (opts, root) => {
@@ -225,7 +234,16 @@ async function run(source, where) {
         "listing cannot say which one it describes",
     );
   }
-  return listing([...volumes][0]);
+  const wrote = listing([...volumes][0]);
+  // Seeded files are INPUT, not output. The listing a page states is captioned
+  // "what it wrote", so a template the harness put there before the run
+  // started does not belong in it. listing() has already made paths relative
+  // to the cwd, which is what a page states, so strip the same prefix here.
+  const cwd = `${process.cwd()}/`;
+  for (const path of Object.keys(seed ?? {})) {
+    wrote.delete(path.startsWith(cwd) ? path.slice(cwd.length) : path);
+  }
+  return wrote;
 }
 
 // ── the listing ───────────────────────────────────────────────────────────
@@ -286,14 +304,26 @@ for (const path of authored) {
   }
   if (found.size === 0) continue;
 
-  for (const [name, { example, result }] of found) {
+  for (const [name, { example, result, input }] of found) {
     pairs++;
     test(`${rel} · ${name} · writes what the page says it writes`, async () => {
       const where = `${rel} · ${name}`;
       assert.ok(example, `${where}: RESULT states an output for an EXAMPLE that is not there`);
       assert.ok(result, `${where}: EXAMPLE states no RESULT`);
 
-      const actual = await run(example, where);
+      // Volume keys are CWD-ABSOLUTE. A page states its input the way it
+      // states its output, relative to the working directory, so the paths
+      // are resolved here rather than spelled out on the page.
+      const seed = input
+        ? Object.fromEntries(
+            [...parseListing(input, `${where} INPUT`)].map(([f, lines]) => [
+              join(process.cwd(), f),
+              lines.join("\n") + "\n",
+            ]),
+          )
+        : undefined;
+
+      const actual = await run(example, where, seed);
       const stated = parseListing(result, where);
       const wrote = `\n\nwhat the run actually wrote:\n\n${render(actual)}\n`;
 
