@@ -66,7 +66,16 @@ jobs:
           grep -q '^# skipped 0$' /tmp/prose.tap \
             || (echo 'prose gate skipped -- the generator checkout is missing' && exit 1)
 
-      # Inert without a sibling generator checkout, which CI does not have.
-      # Kept so the log says which mode it took rather than staying silent
-      # about a check that did not happen.
+      # Deliberately NOT given JOSTRACA_REPO, so this stays inert here and
+      # reports it: sync-docs looks for ../jostraca, and the checkout above is
+      # at .jostraca inside the workspace.
+      #
+      # It could be pointed at that checkout, and then staleness in the synced
+      # pages would fail here instead of waiting for a contributor to notice.
+      # That is a real upgrade and a real coupling: this repository's CI would
+      # then go red whenever a documentation change merges upstream, for a
+      # reason that has nothing to do with the pull request in front of it.
+      # AGENTS.md calls this a contributor-side gate on purpose; changing that
+      # is a decision, not a tidy-up, so it is left as one to make rather than
+      # made here by accident.
       - run: npm run check-sync
