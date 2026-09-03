@@ -1,0 +1,81 @@
+# Build the site and run its tests.
+#
+# THE SITE HAD NO CI AT ALL UNTIL THIS FILE. Cloudflare's git integration
+# builds and deploys on a push to main, which proves the site compiles and
+# nothing else: `npm test` never ran anywhere, so the 52 tests in test/ were
+# a thing a contributor could run rather than a thing that had to pass.
+#
+# That gap is how two banned words reached the live site. test/prose.test.mjs
+# now checks authored prose against the generator's banned list, and a gate
+# nobody runs would have caught them exactly as well as no gate did.
+#
+# No matrix: one runner, one Node. This builds a static site with a Worker in
+# front of it, not a library that has to work on somebody else's platform --
+# the version that matters is the one Cloudflare builds with.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # The generator, for its banned-phrase list. test/prose.test.mjs reads
+      # reject.txt out of this checkout rather than a copy committed here:
+      # one rule, one file, and no second statement of it to drift. Without
+      # it the prose test SKIPS, so this step is what makes that gate real
+      # in CI rather than merely present.
+      - uses: actions/checkout@v7
+        with:
+          repository: jostraca/jostraca
+          path: .jostraca
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      # The tests read dist/, so the build is not optional -- and a test that
+      # skips when dist/ is missing would turn a broken build into a green
+      # run. Build first, and let a build failure fail here.
+      - run: npm run build
+
+      # JOSTRACA_REPO points the prose test at the checkout above. If that
+      # step ever breaks, the test skips rather than fails -- so the run
+      # below asserts it did not, and a silent skip cannot pass for a pass.
+      - run: npm test
+        env:
+          JOSTRACA_REPO: ${{ github.workspace }}/.jostraca
+
+      - name: The prose gate must have run, not skipped
+        env:
+          JOSTRACA_REPO: ${{ github.workspace }}/.jostraca
+        run: |
+          node --test test/prose.test.mjs 2>&1 | tee /tmp/prose.tap
+          grep -q '^# skipped 0$' /tmp/prose.tap \
+            || (echo 'prose gate skipped -- the generator checkout is missing' && exit 1)
+
+      # Deliberately NOT given JOSTRACA_REPO, so this stays inert here and
+      # reports it: sync-docs looks for ../jostraca, and the checkout above is
+      # at .jostraca inside the workspace.
+      #
+      # It could be pointed at that checkout, and then staleness in the synced
+      # pages would fail here instead of waiting for a contributor to notice.
+      # That is a real upgrade and a real coupling: this repository's CI would
+      # then go red whenever a documentation change merges upstream, for a
+      # reason that has nothing to do with the pull request in front of it.
+      # AGENTS.md calls this a contributor-side gate on purpose; changing that
+      # is a decision, not a tidy-up, so it is left as one to make rather than
+      # made here by accident.
+      - run: npm run check-sync
