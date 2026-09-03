@@ -31,6 +31,7 @@ const howto = defineCollection({
     title: z.string(),
     description: z.string(),
     group: z.enum([
+      "install",
       "compose",
       "templates",
       "reuse",

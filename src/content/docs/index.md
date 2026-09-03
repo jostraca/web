@@ -48,13 +48,14 @@ open it. Reach for the part that matches your need:
 
 | If you want to… | Read |
 |---|---|
+| **Install** it, in either implementation | [TypeScript](/how-to/install-typescript) · [Go](/how-to/install-go) |
 | **Learn** Jostraca from zero by building a generator, step by step | [Tutorial](/docs/tutorial) |
 | **Accomplish a specific task** you already have in mind | [How-to guides](/how-to) |
 | **Look up** a component, a prop, an option or a utility | [Components](/docs/reference-components) · [Options](/docs/reference-options) · [Utilities](/docs/reference-utilities) · [Go](/docs/reference-go) |
 | **Understand** how and why Jostraca works the way it does | [Explanation](/docs/explanation) |
 
-The how-to guides are one page per task, grouped six ways: composing
-the output tree; templates and fragments; reusable components;
+The how-to guides are one page per task, grouped seven ways: installing;
+composing the output tree; templates and fragments; reusable components;
 regenerating over existing files; files, copying and permissions; and
 embedding Jostraca in your own tool.
 
@@ -95,7 +96,7 @@ TypeScript is the source of truth. A behaviour change lands in `ts/src/`
 first and Go follows it; `make all` from the repository root builds and
 tests both stacks.
 
-- [The style guide](https://github.com/jostraca/jostraca/blob/master/docs/STYLE-GUIDE.md). How these pages are written: which
+- [The style guide](https://github.com/jostraca/jostraca/blob/main/docs/STYLE-GUIDE.md). How these pages are written: which
   kind of page a fact belongs on, the voice, the banned-phrase list, and
   the snippet directives under which every example runs.
 - [`test/spec/`](https://github.com/jostraca/jostraca/tree/HEAD/test/spec). The shared corpus. A change to any pure helper adds a row there
