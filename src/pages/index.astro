@@ -365,6 +365,19 @@ out/notes.txt
   .hero-copy {
     margin: 0 auto;
   }
+  /* Centre every block in the hero, structurally.
+     global.css caps every <p> at var(--measure), so a paragraph here is
+     NARROWER than the hero and, without auto side margins, sits flush left
+     while its text centres inside it -- which reads as a misalignment
+     rather than as a bug. .lede and h1 each carried their own
+     margin-left/right: auto and looked fine; .eyebrow and .lede-2 were
+     added later without them and did not. Setting it once on the children
+     means the next paragraph added here is centred by default instead of
+     by remembering. */
+  .hero-copy > * {
+    margin-left: auto;
+    margin-right: auto;
+  }
   section:last-of-type {
     border-bottom: none;
   }
