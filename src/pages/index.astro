@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import { Code } from "astro:components";
 import {
   COMPONENTS,
   MODES,
@@ -14,17 +15,14 @@ import {
 
 const EXAMPLE_TREE = `import { Jostraca, Project, Folder, File, Content } from 'jostraca'
 
-const model = { app: { name: 'acme' } }
-const jostraca = Jostraca({ model })
-
-await jostraca.generate({ folder: './out' }, () => {
-  Project({ folder: model.app.name }, () => {
+await Jostraca().generate({ folder: './out' }, () => {
+  Project({ folder: 'acme' }, () => {
     File({ name: 'package.json' }, () => {
-      Content('{ "name": "$$app.name$$" }\\n')
+      Content('{ "name": "acme" }\\n')
     })
     Folder({ name: 'src' }, () => {
       File({ name: 'index.js' }, () => {
-        Content('console.log("$$app.name$$")\\n')
+        Content('console.log("acme")\\n')
       })
     })
   })
@@ -143,6 +141,12 @@ const RESULT_MERGE = `out/config.sh
         editor, formatter, and linter never notice the difference.
       </p>
 
+      <p class="stacks">
+        One generator, <strong>two implementations</strong>: a TypeScript
+        package and a Go module, built from one specification and held to the
+        same shared test corpus.
+      </p>
+
       <div class="cta">
         <a class="button" href="/docs/tutorial">Start the tutorial</a>
         <a class="button ghost" href="/how-to">How-to guides</a>
@@ -162,22 +166,22 @@ const RESULT_MERGE = `out/config.sh
         template language waiting to become your next programming language.
       </p>
       <p>
-        <code>$$app.name$$</code> reaches into the model you passed to
-        <code>Jostraca()</code> and substitutes the value. That happens inside
-        file content. Names are plain JavaScript, as the preceding folder shows,
-        because a component call is a function call and you already have a
-        language for that.
+        Every name here is a plain string, because a component call is a
+        function call and you already have a language for that. Values that
+        come from a model, and the <code>$$app.name$$</code> substitution that
+        reads them, are in the
+        <a href="/docs/tutorial">tutorial</a>.
       </p>
     </div>
 
     <div class="panes">
       <figure>
         <figcaption>gen.mjs</figcaption>
-        <pre><code>{EXAMPLE_TREE}</code></pre>
+        <Code code={EXAMPLE_TREE} lang="js" />
       </figure>
       <figure>
         <figcaption>what it wrote</figcaption>
-        <pre><code>{RESULT_TREE}</code></pre>
+        <Code code={RESULT_TREE} lang="text" />
       </figure>
     </div>
   </section>
@@ -210,17 +214,17 @@ const RESULT_MERGE = `out/config.sh
 
     <figure class="template-in">
       <figcaption>tpl/page.html &mdash; an ordinary HTML file</figcaption>
-      <pre><code>{TEMPLATE_SOURCE}</code></pre>
+      <Code code={TEMPLATE_SOURCE} lang="html" />
     </figure>
 
     <div class="panes">
       <figure>
         <figcaption>gen.mjs</figcaption>
-        <pre><code>{EXAMPLE_TEMPLATE}</code></pre>
+        <Code code={EXAMPLE_TEMPLATE} lang="js" />
       </figure>
       <figure>
         <figcaption>what it wrote</figcaption>
-        <pre><code>{RESULT_TEMPLATE}</code></pre>
+        <Code code={RESULT_TEMPLATE} lang="text" />
       </figure>
     </div>
 
@@ -244,7 +248,7 @@ const RESULT_MERGE = `out/config.sh
 
     <figure class="dialect">
       <figcaption>the same page in a template language</figcaption>
-      <pre><code>{TEMPLATE_DIALECT}</code></pre>
+      <Code code={TEMPLATE_DIALECT} lang="html" />
     </figure>
     <p>
       <code>$$app.name$$</code> follows the same rule. It sits where the host
@@ -277,11 +281,11 @@ const RESULT_MERGE = `out/config.sh
     <div class="panes">
       <figure>
         <figcaption>two runs, with a hand edit in between</figcaption>
-        <pre><code>{EXAMPLE_MERGE}</code></pre>
+        <Code code={EXAMPLE_MERGE} lang="js" />
       </figure>
       <figure>
         <figcaption>what it wrote</figcaption>
-        <pre><code>{RESULT_MERGE}</code></pre>
+        <Code code={RESULT_MERGE} lang="text" />
       </figure>
     </div>
 
@@ -335,11 +339,11 @@ const RESULT_MERGE = `out/config.sh
     <div class="panes">
       <figure>
         <figcaption>npm</figcaption>
-        <pre><code>npm install jostraca@{JOSTRACA_VERSION}</code></pre>
+        <Code code={`npm install jostraca@${JOSTRACA_VERSION}`} lang="sh" />
       </figure>
       <figure>
         <figcaption>Go</figcaption>
-        <pre><code>go get {GO_MODULE}</code></pre>
+        <Code code={`go get ${GO_MODULE}`} lang="sh" />
       </figure>
     </div>
     <p class="more">

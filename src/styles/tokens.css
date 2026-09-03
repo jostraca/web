@@ -25,6 +25,11 @@
   /* 1 ── raw scales ──────────────────────────────────────────────── */
 
   --earth-950: #1d1410;
+
+  /* Code is dark in both themes and neutral, not earth: see the Shiki
+     block in global.css. This is github-dark's own background, so the
+     <pre> chrome and the highlighted spans inside it are one colour. */
+  --code-ground: #24292e;
   --earth-900: #2b1d16;
   --earth-850: #35251d;
   --earth-800: #463126;
@@ -63,7 +68,7 @@
   --bg: var(--earth-50);
   --bg-raised: var(--plaster);
   --bg-sunken: var(--earth-100);
-  --bg-code: var(--earth-100);
+  --bg-code: var(--code-ground);
 
   --ink: var(--earth-900);
   --ink-muted: var(--earth-600);
@@ -106,7 +111,7 @@
     --bg: var(--earth-950);
     --bg-raised: var(--earth-900);
     --bg-sunken: var(--earth-850);
-    --bg-code: var(--earth-850);
+    --bg-code: var(--code-ground);
 
     --ink: var(--earth-100);
     --ink-muted: var(--earth-300);
@@ -131,7 +136,7 @@
   --bg: var(--earth-950);
   --bg-raised: var(--earth-900);
   --bg-sunken: var(--earth-850);
-  --bg-code: var(--earth-850);
+  --bg-code: var(--code-ground);
 
   --ink: var(--earth-100);
   --ink-muted: var(--earth-300);

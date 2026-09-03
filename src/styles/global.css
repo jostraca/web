@@ -207,24 +207,29 @@ samp {
   uses, so a highlighted block and the page around it can never disagree
   about which theme is on.
 */
+/*
+  CODE IS DARK IN BOTH THEMES, deliberately, and this is the one place the
+  site does not follow the page. Code was reading on the earth palette --
+  a brown panel -- which is the site's furniture rather than an editor's,
+  and a reader comparing a block here with the same code in their editor
+  was comparing two different things. github-dark's own neutral ground is
+  what an editor looks like.
+
+  So only the dark palette is selected, and --bg-code matches it rather
+  than the surrounding page.
+*/
 .astro-code,
 .astro-code span {
-  color: var(--shiki-light);
-  background-color: var(--shiki-light-bg);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .astro-code,
-  :root:not([data-theme="light"]) .astro-code span {
-    color: var(--shiki-dark);
-    background-color: var(--shiki-dark-bg);
-  }
-}
-
-:root[data-theme="dark"] .astro-code,
-:root[data-theme="dark"] .astro-code span {
   color: var(--shiki-dark);
   background-color: var(--shiki-dark-bg);
+}
+
+/* The UA default is `margin: 1em 40px`, which insets a <figure> by 40px on
+   each side while every other block sits flush. Two classes on the landing
+   page already reset it one at a time, and the third one added later did not
+   -- so its code block hung 40px inside the two beside it. Reset once. */
+figure {
+  margin: 0;
 }
 
 pre {
