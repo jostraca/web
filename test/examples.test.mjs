@@ -239,9 +239,15 @@ async function run(source, where, seed) {
   // "what it wrote", so a template the harness put there before the run
   // started does not belong in it. listing() has already made paths relative
   // to the cwd, which is what a page states, so strip the same prefix here.
+  //
+  // UNCHANGED ONLY. An example that writes back to a path it was given has
+  // changed it, and that IS output: dropping it regardless would let a page
+  // stay silent about a file the generator rewrote, or state the wrong bytes
+  // for it, and still pass.
   const cwd = `${process.cwd()}/`;
-  for (const path of Object.keys(seed ?? {})) {
-    wrote.delete(path.startsWith(cwd) ? path.slice(cwd.length) : path);
+  for (const [abs, content] of Object.entries(seed ?? {})) {
+    const rel = abs.startsWith(cwd) ? abs.slice(cwd.length) : abs;
+    if (wrote.get(rel) === content) wrote.delete(rel);
   }
   return wrote;
 }
@@ -318,7 +324,11 @@ for (const path of authored) {
         ? Object.fromEntries(
             [...parseListing(input, `${where} INPUT`)].map(([f, lines]) => [
               join(process.cwd(), f),
-              lines.join("\n") + "\n",
+              // No indented lines means an EMPTY file, the same thing it means
+              // in a RESULT listing. Appending the final newline
+              // unconditionally would seed "\n" and quietly hand the example
+              // a byte the page never stated.
+              lines.length === 0 ? "" : lines.join("\n") + "\n",
             ]),
           )
         : undefined;
