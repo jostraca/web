@@ -49,6 +49,12 @@ export const AUTHOR = {
 // Primary navigation.
 export const NAV: { href: string; label: string }[] = [
   { href: "/why", label: "Why" },
+  // Second, not last. Installing is the first thing a reader who is
+  // convinced wants to do, and until now the only routes to it were the
+  // landing page and the how-to index. The target is the group anchor
+  // rather than one stack's guide: picking TypeScript or Go for the reader
+  // is the choice this project does not make anywhere else.
+  { href: "/how-to#install", label: "Install" },
   { href: "/docs", label: "Docs" },
   { href: "/docs/tutorial", label: "Tutorial" },
   { href: "/how-to", label: "How to" },

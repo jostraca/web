@@ -1,7 +1,7 @@
 ---
 import Base from "./Base.astro";
 import { getCollection } from "astro:content";
-import { GITHUB_REPO } from "../consts";
+import { GITHUB_REPO, STACKS } from "../consts";
 
 interface Props {
   title: string;
@@ -34,6 +34,21 @@ const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
 <Base title={title} description={description}>
   <div class="docs">
     <nav class="side" aria-label="Documentation">
+      {/* Install leads, above the collection groups. The install guides are
+          how-to pages, so no docs section carries them, and a reader who
+          arrives here without the package had no route to one from inside
+          the docs at all. Derived from STACKS, so a third implementation
+          appears in this sidebar without a second edit. No aria-current: a
+          docs page is never an install guide, so it can never be the
+          current one. */}
+      <div class="group">
+        <p class="group-name">Install</p>
+        <ul>
+          {STACKS.map((stack) => (
+            <li><a href={stack.install}>{stack.name}</a></li>
+          ))}
+        </ul>
+      </div>
       {groups.map((group) => (
         <div class="group">
           <p class="group-name">{group.name}</p>
@@ -61,7 +76,7 @@ const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
       <h1>{title}</h1>
       <p class="source">
         Rendered from
-        <a href={`${GITHUB_REPO}/blob/master/${source}`} rel="noopener"><code>{source}</code></a>
+        <a href={`${GITHUB_REPO}/blob/main/${source}`} rel="noopener"><code>{source}</code></a>
         in the generator repository — where a correction belongs, and where the
         test suite runs every example on this page or states why it does not.
       </p>

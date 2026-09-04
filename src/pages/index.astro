@@ -151,13 +151,13 @@ const RESULT_MERGE = `out/config.sh
       </p>
 
       <div class="cta">
-        <a class="button" href="/docs/tutorial">Start the tutorial</a>
-        <a class="button ghost" href="/how-to">How-to guides</a>
+        <a class="button" href="/how-to#install">Install Jostraca</a>
+        <a class="button ghost" href="/docs/tutorial">Start the tutorial</a>
         <a class="button ghost" href="/docs">Read the docs</a>
       </div>
 
       <p class="install-cta">
-        Install it now for {STACKS.map((s, i) => (
+        Or straight to {STACKS.map((s, i) => (
           <>{i === 0 ? "" : i === STACKS.length - 1 ? " or " : ", "}<a
             href={s.install}
           >{s.name}</a></>
@@ -443,9 +443,12 @@ const RESULT_MERGE = `out/config.sh
     justify-content: center;
   }
 
-  /* A fourth and fifth button would have made the row a menu. The two
-     install routes are the shortest path for a reader who has already
-     decided, so they sit under the buttons as a sentence instead. */
+  /* Still three buttons: a fourth and fifth would have made the row a menu,
+     which is why the per-stack routes stay a sentence rather than joining
+     it. Install leads the row now, and "How-to guides" leaves it -- the top
+     nav carries that, and the install button lands on the how-to index
+     anyway, so the row loses no destination. The sentence under it is the
+     shorter path for a reader who has already picked a stack. */
   .install-cta {
     margin-top: 14px;
     font-size: 0.94rem;
