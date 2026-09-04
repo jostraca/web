@@ -24,7 +24,7 @@
     "@astrojs/mdx": "4.3.13",
     "@astrojs/sitemap": "3.6.1",
     "astro": "5.16.9",
-    "jostraca": "0.33.1",
+    "jostraca": "0.36.4",
     "typescript": "5.9.3"
   },
   "devDependencies": {
